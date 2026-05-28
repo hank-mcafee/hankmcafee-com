@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BidX - Proposal Proto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://assets.infotechinc.com/causeway-sdk/v1.94.1/tailwind-preset.umd.js"></script>
+  <script>tailwind.config = { presets: [CausewayTailwindPreset], safelist: ['bg-admin'] }</script>
+  <script src="https://bcdn.infotechinc.com/causeway/v1.94.1/all.umd.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://bcdn.infotechinc.com/causeway/v1.94.1/slideout.umd.js" defer></script>
+  <style type="text/tailwindcss">
+    @layer base {
+      html, body { @apply min-h-full h-full; }
+      body { background-color: #F3F6F8; color: #2C3D4F; -webkit-font-smoothing: antialiased; }
+      small { @apply text-sm; }
+      h1, h2, h3, h4, h5, h6 { @apply leading-tight; }
+      h1 { font-size: 2em; }
+      h2 { font-size: 1.5em; }
+      h3 { font-size: 1.25em; }
+    }
+    @layer utilities {
+      .bg-admin {
+        background-color: #E6F5F0;
+        background-image:
+          linear-gradient(#D0ECE0 1px, transparent 1px),
+          linear-gradient(90deg, #D0ECE0 1px, transparent 1px);
+        background-size: 10px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <cw-bidx-app-layout
+      user-name="Harold McAfee"
+      user-email="h.mcafee@gadot.gov"
+      business-name="Georgia Department of Transportation"
+      agency-name="Georgia Department of Transportation">
+
+      <!-- Agency picker -->
+      <cw-bidx-agency-picker-item
+        slot="agencies"
+        content="Georgia Department of Transportation"
+        agency-id="GADOT"
+        href="#">
+      </cw-bidx-agency-picker-item>
+      <cw-bidx-agency-picker-item
+        slot="agencies"
+        content="Atlanta Regional Commission"
+        agency-id="ARC"
+        href="#">
+      </cw-bidx-agency-picker-item>
+
+      <!-- Help dropdown -->
+      <cw-dropdown-menu-group slot="help">
+        <cw-dropdown-menu-item content="Knowledge base" href="#" target="_blank">
+          <cw-icon-open-in-new slot="icon-right"></cw-icon-open-in-new>
+        </cw-dropdown-menu-item>
+      </cw-dropdown-menu-group>
+      <cw-dropdown-menu-item slot="help" content="Send feedback…"></cw-dropdown-menu-item>
+
+      <!-- User menu actions -->
+      <cw-button slot="user-menu-actions" size="sm" theme="secondary" appearance="outlined" content="Settings"></cw-button>
+      <cw-button slot="user-menu-actions" size="sm" theme="secondary" content="Sign out"></cw-button>
+
+      <!-- Sidebar: global nav -->
+      <cw-app-menu-item slot="menu" content="Workspace" href="#">
+        <cw-icon-view-dashboard></cw-icon-view-dashboard>
+      </cw-app-menu-item>
+
+      <!-- Sidebar: agency nav -->
+      <cw-app-menu-item slot="menu-agency" content="Home" href="#">
+        <cw-icon-federal></cw-icon-federal>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Lettings" href="#" active>
+        <cw-icon-calendar></cw-icon-calendar>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Item search" href="#">
+        <cw-icon-magnify></cw-icon-magnify>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Competitor Insights" href="#">
+        <cw-icon-line-chart></cw-icon-line-chart>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Bid Tab Analysis" href="#">
+        <cw-icon-analytics-alt></cw-icon-analytics-alt>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Small Business Network" href="#">
+        <cw-icon-group></cw-icon-group>
+      </cw-app-menu-item>
+      <cw-app-menu-item slot="menu-agency" content="Agency Admin" href="#">
+        <cw-icon-admin></cw-icon-admin>
+      </cw-app-menu-item>
+
+      <!-- Footer links -->
+      <a slot="footer-links" href="https://www.infotechinc.com/legal-notices" target="_blank">Legal</a>
+      <a slot="footer-links" href="https://releases.infotechinc.com/#all+Bidx.com+all" target="_blank">Releases</a>
+      <a slot="footer-links" href="https://www.infotechinc.com/contact" target="_blank">Contact</a>
+      <a slot="footer-links" href="#">Support</a>
+
+      <!-- ─── Main content ─── -->
+      <div class="h-full scroll-mt-14" :class="{ 'bg-admin': viewMode === 'agency' }">
+      <section class="flex flex-col gap-y-6 p-6">
+
+        <!-- Breadcrumbs -->
+        <cw-breadcrumbs>
+          <cw-breadcrumb content="Lettings" href="#"></cw-breadcrumb>
+          <cw-breadcrumb content="May 15, 2026" href="#"></cw-breadcrumb>
+          <cw-breadcrumb content="B1CBA2601372-0" current></cw-breadcrumb>
+        </cw-breadcrumbs>
+
+        <!-- Agency / Contractor toggle -->
+        <div class="flex flex-col gap-y-4">
+          <div class="flex w-full justify-center">
+            <cw-segmented-switches :value="viewMode" :label="`Viewing page as ${viewMode}`" @change="viewMode = $event.detail"
+              class="w-[384px]">
+              <cw-segmented-switch content="Agency" value="agency"></cw-segmented-switch>
+              <cw-segmented-switch content="Contractor" value="contractor"></cw-segmented-switch>
+            </cw-segmented-switches>
+          </div>
+        </div>
+
+        <!-- Proposal header -->
+        <div class="flex flex-col justify-between gap-y-6 sm:flex-row sm:gap-x-10" data-cy="proposal-details">
+
+          <!-- Left: metadata -->
+          <header class="flex w-full flex-col gap-y-2 sm:max-w-[66%]">
+            <div class="flex flex-col gap-y-1">
+              <span class="text-sm text-secondary">Georgia Department of Transportation</span>
+              <h1 class="flex flex-wrap items-end gap-x-4 text-xl font-semibold m-0">
+                <div>Call 001</div>
+                <div data-cy="cont-id" class="flex">
+                  <span class="pr-2">B1CBA2601372-0</span>
+                  <cw-icon-sparkles size="xs" class="self-start text-amethyst-300"></cw-icon-sparkles>
+                  <button type="button" id="header-bookmark-btn"
+                    class="group relative h-6 w-6 text-amethyst"
+                    aria-label="follow proposal">
+                    <cw-icon-bookmark-outline size="lg" class="text-midnight-200 group-hover:hidden"></cw-icon-bookmark-outline>
+                    <cw-icon-bookmark-add size="lg" class="hidden group-hover:inline-block"></cw-icon-bookmark-add>
+                  </button>
+                  <cw-tooltip for="header-bookmark-btn" content="Follow proposal"
+                    allowed-placements="top" offset="8" strategy="fixed" theme="midnight"></cw-tooltip>
+                </div>
+              </h1>
+              <p class="text-sm font-medium text-secondary">Clarke</p>
+            </div>
+            <div class="flex flex-wrap gap-x-6 gap-y-1 text-xs text-secondary">
+              <span>Project ID: 0016920</span>
+              <span>2 Amendments</span>
+            </div>
+            <div class="flex items-end gap-2 flex-row">
+              <p class="text-xs text-midnight-400 line-clamp-3">CONSTRUCTION OF A ROUNDABOUT ON SR 10 (CR 993) AT WEST HANCOCK AVE. (E)</p>
+            </div>
+            <div class="flex items-center gap-2 px-2 py-1">
+              <cw-tag-collection>
+                <cw-icon-sparkles size="sm" class="icon-gradient-sunset-500"></cw-icon-sparkles>
+                <cw-tag content="New Construction" theme="amethyst" size="sm"></cw-tag>
+                <cw-tag content="Roadway" theme="amethyst" size="sm"></cw-tag>
+              </cw-tag-collection>
+            </div>
+          </header>
+
+          <!-- Right: status + bid files -->
+          <section class="flex w-full flex-col items-center gap-y-3 md:max-w-64">
+            <div class="flex w-full items-center justify-between gap-x-4 text-secondary md:gap-x-6">
+              <div class="text-xs">
+                <p class="flex flex-col">
+                  <span>Time remaining</span>
+                  <span class="font-bold">7 days 2 hours</span>
+                </p>
+              </div>
+              <div class="flex gap-x-2">
+                <div>
+                  <a href="#" id="next-proposal-btn"
+                    class="block h-8 w-8 rounded-full bg-midnight-100 text-midnight-600 hover:bg-midnight-200"
+                    aria-label="go to next letting">
+                    <cw-icon-arrow-alt-right class="m-2" size="sm"></cw-icon-arrow-alt-right>
+                  </a>
+                  <cw-tooltip for="next-proposal-btn" content="Call 002"
+                    allowed-placements="top" offset="8" strategy="absolute" theme="midnight"></cw-tooltip>
+                </div>
+              </div>
+            </div>
+            <div class="flex w-full flex-col items-center gap-y-3 md:max-w-64">
+              <cw-button href="#" content="Bid files" class="w-full"
+                theme="primary" appearance="filled" size="md">
+                <cw-icon-download slot="icon-right" size="sm"></cw-icon-download>
+              </cw-button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Resource links + Export -->
+        <div class="box-content flex min-h-8 justify-between gap-x-2 border-b border-specter-500 pb-4">
+
+          <!-- Mobile: Resources dropdown (hidden on sm+) -->
+          <cw-button id="letting-resources" aria-label="show letting resources"
+            appearance="ghost" class="sm:hidden" content="Resources" size="md" theme="primary">
+            <cw-icon-caret-down slot="icon-right" size="sm"></cw-icon-caret-down>
+          </cw-button>
+          <cw-dropdown-menu for="letting-resources" class="sm:hidden" strategy="fixed">
+            <cw-dropdown-menu-item content="Attachments" theme="action"></cw-dropdown-menu-item>
+            <cw-dropdown-menu-item content="Plan holders" theme="action"></cw-dropdown-menu-item>
+            <cw-dropdown-menu-item content="Plan room" theme="action"></cw-dropdown-menu-item>
+            <cw-dropdown-menu-item content="Q&amp;A" theme="action" @click="openQA()"></cw-dropdown-menu-item>
+          </cw-dropdown-menu>
+
+          <!-- Desktop: individual resource links (hidden below sm) -->
+          <ul class="hidden flex-wrap gap-x-2 gap-y-4 sm:flex list-none p-0 m-0">
+            <li>
+              <cw-button appearance="ghost" theme="primary" size="md">
+                <div class="flex items-center gap-1">
+                  Attachments
+                  <cw-badge content="9" size="sm" theme="specter"></cw-badge>
+                </div>
+              </cw-button>
+            </li>
+            <li>
+              <cw-button appearance="ghost" theme="primary" size="md">
+                <div class="flex items-center gap-1">
+                  Plan holders
+                  <cw-badge content="7" size="sm" theme="specter"></cw-badge>
+                </div>
+              </cw-button>
+            </li>
+            <li>
+              <cw-button appearance="ghost" theme="primary" size="md">
+                <div class="flex items-center gap-1">
+                  Plan room
+                  <cw-badge content="1" size="sm" theme="specter"></cw-badge>
+                </div>
+              </cw-button>
+            </li>
+            <li>
+              <cw-button appearance="ghost" theme="primary" size="md" @click="openQA()">
+                <div class="flex items-center gap-1">
+                  Q&amp;A
+                  <cw-badge :content="String(questions.length)" size="sm" theme="specter"></cw-badge>
+                </div>
+              </cw-button>
+            </li>
+          </ul>
+
+          <!-- Export button + popover -->
+          <cw-button id="proposal-export-popover" aria-label="show export options"
+            theme="primary" appearance="ghost" content="Export" size="md">
+            <cw-icon-caret-down slot="icon-right" size="sm"></cw-icon-caret-down>
+          </cw-button>
+          <cw-popover no-close="" allowed-placements="bottom-end" size="sm"
+            for="proposal-export-popover" offset="8" strategy="fixed" theme="white">
+            <div class="pb-2 text-xs text-secondary">EXPORTS - PROPOSAL</div>
+            <ul class="flex flex-col gap-y-2 divide-y divide-specter-500">
+              <li class="flex items-center justify-between gap-x-3 pt-2">
+                <p class="min-w-0 break-words font-medium text-primary">Items</p>
+                <div class="flex gap-x-2">
+                  <cw-button content="CSV" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                  <cw-button content="TAB" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                </div>
+              </li>
+              <li class="flex items-center justify-between gap-x-3 pt-2">
+                <p class="min-w-0 break-words font-medium text-primary">Plan holders</p>
+                <div class="flex gap-x-2">
+                  <cw-button content="CSV" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                  <cw-button content="TAB" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                </div>
+              </li>
+              <li class="flex items-center justify-between gap-x-3 pt-2">
+                <p class="min-w-0 break-words font-medium text-primary">Q&amp;A</p>
+                <div class="flex gap-x-2">
+                  <cw-button content="CSV" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                  <cw-button content="TAB" size="sm" theme="secondary" appearance="ghost"></cw-button>
+                </div>
+              </li>
+            </ul>
+          </cw-popover>
+
+        </div>
+
+        <!-- Items toolbar: search + unit filter -->
+        <div class="flex items-center gap-4">
+          <cw-input-search placeholder="Search items" class="grow" size="md"></cw-input-search>
+          <cw-select placeholder="Any unit" width="sm" clearable="" aria-label="filter by unit"
+            appearance="filled" size="md" strategy="fixed">
+            <cw-select-option content="LS"  value="LS"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="AC"  value="AC"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="TN"  value="TN"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="EA"  value="EA"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="LF"  value="LF"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="MO"  value="MO"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="GL"  value="GL"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="SY"  value="SY"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="GLM" value="GLM" layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="CY"  value="CY"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="LB"  value="LB"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="SF"  value="SF"  layout="inline" size="md"></cw-select-option>
+            <cw-select-option content="GLF" value="GLF" layout="inline" size="md"></cw-select-option>
+          </cw-select>
+        </div>
+
+        <!-- Items toolbar: count + sort + favorites -->
+        <div class="flex flex-wrap justify-between gap-y-4">
+          <div class="flex grow basis-64 items-center text-xs text-secondary">
+            <span class="min-w-18 pr-4">{{ itemCountLabel }}</span>
+            <label for="sort-type-select" class="pr-2">Sort by:</label>
+            <cw-select id="sort-type-select" size="sm" appearance="ghost" class="max-w-[80px]" name="sort by property" strategy="fixed" value="numericLineNumber" width="fill">
+              <cw-select-option content="Line" value="numericLineNumber" layout="inline" size="sm"></cw-select-option>
+              <cw-select-option content="Item ID" value="itemnumber" layout="inline" size="sm"></cw-select-option>
+              <cw-select-option content="Quantity" value="quantity" layout="inline" size="sm"></cw-select-option>
+              <cw-select-option content="Unit" value="unit" layout="inline" size="sm"></cw-select-option>
+            </cw-select>
+            <button class="flex items-center gap-x-1" aria-label="sort ascending">
+              <cw-icon-sort-desc size="sm"></cw-icon-sort-desc>
+              <span>A-Z</span>
+            </button>
+          </div>
+          <cw-toggle
+            :checked.prop="favoritesOnly"
+            @change="favoritesOnly = !favoritesOnly"
+            size="sm"
+            layout="left"
+            content="Favorites">
+            <cw-icon-star slot="icon" size="sm"></cw-icon-star>
+          </cw-toggle>
+        </div>
+
+        <!-- Line items: Section 0001 ROADWAY -->
+        <cw-bidx-proposal-item-section v-if="filteredRoadway.length" section-id="0001" description="ROADWAY">
+          <cw-bidx-proposal-item v-for="item in filteredRoadway" :key="item.line">
+            <div class="w-full">
+              <div class="flex grow flex-col gap-3">
+                <div class="flex flex-wrap justify-end gap-x-4 gap-y-3">
+                  <div class="flex min-w-44 grow basis-44 flex-wrap gap-x-4 gap-y-1">
+                    <div class="flex min-h-6 max-w-60 grow basis-44 flex-wrap items-center gap-x-4 font-medium">
+                      <div class="shrink-0 basis-[60px]">{{ item.line }}</div>
+                      <button
+                        type="button"
+                        class="group relative h-6 w-6 text-amethyst"
+                        :id="`item-${item.line.replace('Line ', '')}`"
+                        :aria-label="item.starred ? 'Remove favorite' : 'Add favorite'"
+                        @click="item.starred = !item.starred">
+                        <cw-icon-star v-if="item.starred" size="lg" class="text-amber hover:text-amber-300"></cw-icon-star>
+                        <cw-icon-star-outline v-else size="lg" class="text-midnight-200 hover:text-amber-300"></cw-icon-star-outline>
+                      </button>
+                      <cw-tooltip
+                        :for="`item-${item.line.replace('Line ', '')}`"
+                        :content="item.starred ? 'Remove favorite' : 'Add favorite'"
+                        allowed-placements="top"
+                        offset="8"
+                        strategy="fixed"
+                        theme="midnight">
+                      </cw-tooltip>
+                      <div class="text-nowrap">{{ item.code }}</div>
+                    </div>
+                    <div class="flex grow basis-44 items-center font-medium">{{ item.description }}</div>
+                  </div>
+                  <div class="flex min-w-32 basis-32 flex-col self-center">
+                    <div class="flex w-full items-center justify-end gap-x-1.5">
+                      <div>{{ item.qty }}</div>
+                      <div class="w-10">{{ item.unit }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </cw-bidx-proposal-item>
+        </cw-bidx-proposal-item-section>
+
+        <!-- Line items: Section 0002 DRAINAGE -->
+        <cw-bidx-proposal-item-section v-if="filteredDrainage.length" section-id="0002" description="DRAINAGE" class="mt-2">
+          <cw-bidx-proposal-item v-for="item in filteredDrainage" :key="item.line">
+            <div class="w-full">
+              <div class="flex grow flex-col gap-3">
+                <div class="flex flex-wrap justify-end gap-x-4 gap-y-3">
+                  <div class="flex min-w-44 grow basis-44 flex-wrap gap-x-4 gap-y-1">
+                    <div class="flex min-h-6 max-w-60 grow basis-44 flex-wrap items-center gap-x-4 font-medium">
+                      <div class="shrink-0 basis-[60px]">{{ item.line }}</div>
+                      <button
+                        type="button"
+                        class="group relative h-6 w-6 text-amethyst"
+                        :id="`item-${item.line.replace('Line ', '')}`"
+                        :aria-label="item.starred ? 'Remove favorite' : 'Add favorite'"
+                        @click="item.starred = !item.starred">
+                        <cw-icon-star v-if="item.starred" size="lg" class="text-amber hover:text-amber-300"></cw-icon-star>
+                        <cw-icon-star-outline v-else size="lg" class="text-midnight-200 hover:text-amber-300"></cw-icon-star-outline>
+                      </button>
+                      <cw-tooltip
+                        :for="`item-${item.line.replace('Line ', '')}`"
+                        :content="item.starred ? 'Remove favorite' : 'Add favorite'"
+                        allowed-placements="top"
+                        offset="8"
+                        strategy="fixed"
+                        theme="midnight">
+                      </cw-tooltip>
+                      <div class="text-nowrap">{{ item.code }}</div>
+                    </div>
+                    <div class="flex grow basis-44 items-center font-medium">{{ item.description }}</div>
+                  </div>
+                  <div class="flex min-w-32 basis-32 flex-col self-center">
+                    <div class="flex w-full items-center justify-end gap-x-1.5">
+                      <div>{{ item.qty }}</div>
+                      <div class="w-10">{{ item.unit }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </cw-bidx-proposal-item>
+        </cw-bidx-proposal-item-section>
+
+      </section>
+      </div>
+    </cw-bidx-app-layout>
+
+    <!-- ── Q&A slideout (browsing: list + question detail) — clickaway ON ── -->
+    <cw-slideout id="qa-slideout" :heading="viewMode === 'agency' ? 'Q&A management' : 'Q&A'"
+      size="md" no-padding clickaway placement="right" @close="qaView = 'list'">
+
+      <cw-button v-if="qaView === 'question'" slot="actions-header" theme="primary" appearance="ghost" size="sm" content="Back" @click="qaView = 'list'">
+        <cw-icon-chevron-left slot="icon-left" size="sm"></cw-icon-chevron-left>
+      </cw-button>
+      <template v-if="qaView !== 'question'">
+        <cw-button id="qa-export-browse" slot="actions-header" theme="secondary" appearance="ghost" size="sm" content="Export">
+          <cw-icon-caret-down slot="icon-right" size="sm"></cw-icon-caret-down>
+        </cw-button>
+        <cw-dropdown-menu for="qa-export-browse" strategy="fixed">
+          <cw-dropdown-menu-item content="CSV" theme="action"></cw-dropdown-menu-item>
+          <cw-dropdown-menu-item content="TAB" theme="action"></cw-dropdown-menu-item>
+        </cw-dropdown-menu>
+      </template>
+
+      <div class="flex flex-1 flex-col gap-4 m-6 mt-1 pb-4">
+
+        <!-- Proposal meta -->
+        <section class="flex flex-col gap-4 text-xs">
+          <p class="text-secondary">Georgia Department of Transportation</p>
+          <div class="flex flex-col gap-0.5">
+            <p class="text-sm font-medium">May 15, 2026</p>
+            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-secondary">
+              <!-- TODO (dev): only render this row if the proposal has a district value -->
+              <!-- <dt>District:</dt><dd>AT</dd> -->
+              <dt>Letting ID:</dt><dd>26051501</dd>
+            </dl>
+          </div>
+        </section>
+
+        <!-- Proposal select -->
+        <cw-field-group v-if="qaView === 'list' || qaView === 'question'" size="md" class="max-w-[320px]">
+          <label slot="label">Proposal</label>
+          <cw-select value="B1CBA2601372-0" size="md" width="fill" strategy="fixed"
+            :readonly="qaView === 'question' || undefined">
+            <cw-select-option content="Call 001 | B1CBA2601372-0" value="B1CBA2601372-0" size="md" layout="inline"></cw-select-option>
+          </cw-select>
+        </cw-field-group>
+        <!-- ── LIST VIEW ── -->
+        <template v-if="qaView === 'list'">
+          <cw-input-search :value="qaSearch" @input="qaSearch = $event.target.value" placeholder="Search questions" size="md" width="fill"></cw-input-search>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs text-secondary">
+              <span>{{ qaCountLabel }}</span>
+              <cw-toggle v-if="viewMode === 'contractor'"
+                :checked.prop="qaFilterUnread" @change="qaFilterUnread = !qaFilterUnread"
+                size="sm" layout="left" content="Answered"></cw-toggle>
+              <cw-toggle v-if="viewMode === 'agency'"
+                :checked.prop="qaFilterUnanswered" @change="qaFilterUnanswered = !qaFilterUnanswered"
+                size="sm" layout="left" content="Unanswered"></cw-toggle>
+            </div>
+            <div class="flex flex-col -mx-6">
+            <button v-for="item in filteredQuestions" :key="item.id"
+              @click="selectQuestion(item)"
+              class="w-full text-left pl-8 hover:bg-specter-50">
+              <div class="flex items-start gap-6 border-b border-specter-500 pr-7 py-4">
+                <!-- Left: subject + question; indicator hangs into pl-8 zone -->
+                <div class="relative flex min-w-0 grow flex-col gap-1">
+                  <cw-indicator v-if="item.unread" size="md" status="notice" theme="white"
+                    class="absolute -left-4 top-1"></cw-indicator>
+                  <span class="h-5 truncate text-sm font-medium leading-5">{{ item.subject }}</span>
+                  <p class="leading-4 text-xs text-secondary line-clamp-2">{{ item.question }}</p>
+                </div>
+                <!-- Right: status/time + identifiers; chevron hangs into pr-7 zone -->
+                <div class="relative flex shrink-0 self-stretch flex-col items-end gap-1.5 pt-[2px]">
+                  <cw-icon-chevron-right size="sm" class="absolute -right-5 top-0 text-secondary"></cw-icon-chevron-right>
+                  <div class="shrink-0 flex flex-col items-start">
+                    <cw-tag v-if="qaShowTag(item) === 'answered'" content="Answered" theme="emerald" size="sm"></cw-tag>
+                    <cw-tag v-else-if="qaShowTag(item) === 'pending'" content="Pending" theme="amber" size="sm"></cw-tag>
+                    <cw-tag v-else-if="qaShowTag(item) === 'draft'" content="Draft" theme="specter" size="sm"></cw-tag>
+                    <span v-else class="whitespace-nowrap text-right text-xs text-secondary">{{ qaTimeLabel(item) }}</span>
+                  </div>
+                  <div class="shrink-0 flex flex-col items-end justify-end text-xs text-secondary">
+                    <p class="text-right">{{ item.call }}</p>
+                    <p class="text-right">Q# {{ item.index }}</p>
+                  </div>
+                </div>
+              </div>
+            </button>
+            </div>
+            <div v-if="filteredQuestions.length === 0" class="flex items-center justify-center py-12">
+              <cw-empty-state content="No questions found" type="text"></cw-empty-state>
+            </div>
+          </div>
+        </template>
+
+        <!-- ── QUESTION DETAIL ── -->
+        <template v-if="qaView === 'question' && qaActiveQ">
+          <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-baseline gap-x-6 gap-y-0">
+              <h2 class="m-0 text-sm font-semibold">Question # {{ qaActiveQ.index }}</h2>
+              <span class="text-xs text-secondary">{{ qaActiveQ.submittedAt }}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <cw-button v-if="viewMode === 'contractor' && isOwnQuestion && qaActiveQ.status !== 'answered' && qaActiveQ.status !== 'pending' && qaActiveQ.status !== 'draft'"
+                size="md" theme="primary" appearance="ghost" content="Edit" @click="editOwnQuestion()">
+                <cw-icon-edit slot="icon-right" size="sm"></cw-icon-edit>
+              </cw-button>
+              <cw-button size="md" theme="secondary" appearance="outlined" icon-only
+                :disabled="qaActivePosition <= 0" @click="prevQuestion()">
+                <cw-icon-chevron-up slot="icon"></cw-icon-chevron-up>
+              </cw-button>
+              <cw-button size="md" theme="secondary" appearance="outlined" icon-only
+                :disabled="qaActivePosition >= questions.length - 1" @click="nextQuestion()">
+                <cw-icon-chevron-down slot="icon"></cw-icon-chevron-down>
+              </cw-button>
+            </div>
+          </div>
+          <div class="flex flex-col gap-1 pb-4">
+            <h3 class="m-0 text-sm font-semibold">{{ qaActiveQ.subject }}</h3>
+            <p class="text-sm">{{ qaActiveQ.question }}</p>
+            <div v-if="viewMode === 'agency' || isOwnQuestion" class="flex items-start gap-2 text-xs text-secondary mt-1">
+              <cw-icon-person size="sm" class="shrink-0 text-secondary"></cw-icon-person>
+              <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                <span>{{ qaActiveQ.submitter.name }}</span>
+                <span class="text-midnight-200">·</span>
+                <span>{{ qaActiveQ.submitter.company }}</span>
+                <template v-if="qaActiveQ.submitter.phone">
+                  <span class="text-midnight-200">·</span>
+                  <span>{{ qaActiveQ.submitter.phone }}</span>
+                </template>
+              </div>
+            </div>
+          </div>
+          <!-- Contractor status zones -->
+          <template v-if="viewMode === 'contractor'">
+            <div v-if="qaActiveQ.status === 'pending' || qaActiveQ.status === 'draft'" class="flex flex-1 flex-col items-center gap-2 rounded bg-amber-100 p-10 text-center justify-center">
+              <cw-icon-time size="sm" class="text-amber-800"></cw-icon-time>
+              <p class="text-sm font-medium text-amber-800">GADOT is preparing an answer.<br>Most answers take less than 24 hours.</p>
+            </div>
+            <div v-else-if="qaActiveQ.status === 'answered' && qaActiveQ.visible" class="flex flex-col gap-2">
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                <cw-tag content="Answered" theme="emerald" size="sm"></cw-tag>
+                <span class="text-xs text-secondary">{{ qaActiveQ.answeredAt }}</span>
+              </div>
+              <p class="text-sm">{{ qaActiveQ.answer }}</p>
+              <div v-if="isOwnQuestion" class="flex items-start gap-2 text-xs text-secondary">
+                <cw-icon-federal size="sm" class="shrink-0 text-secondary"></cw-icon-federal>
+                <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                  <span>{{ qaActiveQ.answeredBy }}</span>
+                  <span class="text-midnight-200">·</span>
+                  <span>GADOT</span>
+                </div>
+              </div>
+            </div>
+            <div v-else class="flex flex-1 items-center justify-center">
+              <div class="py-6 w-full flex items-center justify-center">
+                <cw-empty-state content="Agency has not answered yet" type="text-alt"></cw-empty-state>
+              </div>
+            </div>
+          </template>
+          <!-- Agency status zones -->
+          <template v-if="viewMode === 'agency'">
+            <div v-if="qaActiveQ.status === 'unanswered'" class="flex flex-1 items-center justify-center">
+              <div class="py-6 w-full flex items-center justify-center">
+                <cw-empty-state content="No answer saved" type="text-alt"></cw-empty-state>
+              </div>
+            </div>
+            <div v-else-if="qaActiveQ.status === 'draft'" class="flex flex-col gap-2">
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                <cw-tag content="Draft" theme="specter" size="sm"></cw-tag>
+                <span class="text-xs text-secondary">{{ qaActiveQ.answeredAt }}</span>
+              </div>
+              <p class="text-sm">{{ qaActiveQ.answer }}</p>
+              <div class="flex items-start gap-2 text-xs text-secondary">
+                <cw-icon-federal size="sm" class="shrink-0 text-secondary"></cw-icon-federal>
+                <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                  <span>{{ qaActiveQ.answeredBy }}</span>
+                  <span class="text-midnight-200">·</span>
+                  <span>GADOT</span>
+                </div>
+              </div>
+            </div>
+            <div v-else-if="qaActiveQ.status === 'pending' && qaActiveQ.assignedTo" class="flex flex-1 flex-col items-center justify-center gap-2 rounded bg-azul-50 p-10 text-center">
+              <cw-icon-federal size="md" class="text-secondary"></cw-icon-federal>
+              <p class="text-sm font-medium text-secondary">Assigned to {{ qaActiveQ.assignedTo }} on<br>{{ qaActiveQ.assignedAt }}</p>
+            </div>
+            <div v-else-if="qaActiveQ.status === 'answered'" class="flex flex-col gap-2">
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                <cw-tag content="Answered" theme="emerald" size="sm"></cw-tag>
+                <span class="text-xs text-secondary">{{ qaActiveQ.answeredAt }}</span>
+              </div>
+              <p class="text-sm">{{ qaActiveQ.answer }}</p>
+              <div class="flex items-start gap-2 text-xs text-secondary">
+                <cw-icon-federal size="sm" class="shrink-0 text-secondary"></cw-icon-federal>
+                <div class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                  <span>{{ qaActiveQ.answeredBy }}</span>
+                  <span class="text-midnight-200">·</span>
+                  <span>GADOT</span>
+                </div>
+              </div>
+            </div>
+          </template>
+        </template>
+
+      </div>
+
+      <!-- Footer: contractor list -->
+      <cw-button v-if="qaView === 'list' && viewMode === 'contractor'" slot="actions-footer"
+        theme="primary" appearance="filled" class="w-full" @click="enterForm('new')">+ New question</cw-button>
+      <!-- Footer: agency list -->
+      <cw-button v-if="qaView === 'list' && viewMode === 'agency'" slot="actions-footer"
+        theme="destructive" appearance="ghost" class="w-full" @click="enterForm('edit-list')">
+        Remove questions
+        <cw-icon-edit slot="icon-right" size="sm"></cw-icon-edit>
+      </cw-button>
+      <!-- Footer: contractor question detail -->
+      <cw-button v-if="qaView === 'question' && viewMode === 'contractor'" slot="actions-footer"
+        theme="primary" appearance="filled" class="w-full" @click="enterForm('new')">+ New question</cw-button>
+      <!-- Footer: agency question detail -->
+      <cw-button v-if="qaView === 'question' && viewMode === 'agency'" slot="actions-footer"
+        theme="primary" appearance="filled" class="w-full" @click="startEditQuestion()">Answer or assign
+        <cw-icon-edit slot="icon-right" size="sm"></cw-icon-edit>
+      </cw-button>
+
+    </cw-slideout>
+
+    <!-- ── Q&A slideout (forms: new / edit-list / edit-question) — clickaway OFF ── -->
+    <cw-slideout id="qa-slideout-form" :heading="viewMode === 'agency' ? 'Q&A management' : 'Q&A'"
+      size="md" no-padding placement="right" @close="qaView = 'list'">
+
+      <cw-button v-if="qaView === 'edit-list'" id="qa-export-form" slot="actions-header" theme="secondary" appearance="ghost" size="sm" content="Export">
+        <cw-icon-caret-down slot="icon-right" size="sm"></cw-icon-caret-down>
+      </cw-button>
+      <cw-dropdown-menu v-if="qaView === 'edit-list'" for="qa-export-form" strategy="fixed">
+        <cw-dropdown-menu-item content="CSV" theme="action"></cw-dropdown-menu-item>
+        <cw-dropdown-menu-item content="TAB" theme="action"></cw-dropdown-menu-item>
+      </cw-dropdown-menu>
+
+      <div class="flex flex-1 flex-col gap-4 m-6 mt-1 pb-4">
+
+        <!-- Proposal meta -->
+        <section class="flex flex-col gap-4 text-xs">
+          <p class="text-secondary">Georgia Department of Transportation</p>
+          <div class="flex flex-col gap-0.5">
+            <p class="text-sm font-medium">May 15, 2026</p>
+            <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5 text-secondary">
+              <!-- TODO (dev): only render this row if the proposal has a district value -->
+              <!-- <dt>District:</dt><dd>AT</dd> -->
+              <dt>Letting ID:</dt><dd>26051501</dd>
+            </dl>
+          </div>
+        </section>
+
+        <!-- Proposal select (edit-list) -->
+        <cw-select v-if="qaView === 'edit-list'" value="B1CBA2601372-0" size="md" width="fill" strategy="fixed" class="max-w-[320px]">
+          <cw-select-option content="Call 001 | B1CBA2601372-0" value="B1CBA2601372-0" size="md" layout="inline"></cw-select-option>
+        </cw-select>
+
+        <!-- ── NEW QUESTION FORM (contractor) ── -->
+        <template v-if="qaView === 'new'">
+          <div class="flex flex-col gap-4">
+            <cw-field-group size="md" class="max-w-[320px]">
+              <label slot="label">Proposal</label>
+              <cw-select value="B1CBA2601372-0" size="md" width="fill" strategy="fixed" readonly>
+                <cw-select-option content="Call 001 | B1CBA2601372-0" value="B1CBA2601372-0" size="md" layout="inline"></cw-select-option>
+              </cw-select>
+            </cw-field-group>
+            <cw-field-group size="md">
+              <label slot="label">Subject</label>
+              <cw-input id="qa-new-subject" :value="qaNewForm.subject" @input="qaNewForm.subject = $event.target.value; clearNewErr('qa-new-subject')" size="md" required></cw-input>
+              <cw-field-errors slot="errors" for="qa-new-subject" size="md"></cw-field-errors>
+            </cw-field-group>
+            <cw-field-group size="md">
+              <label slot="label">Question</label>
+              <cw-textarea id="qa-new-question" :value="qaNewForm.question" @input="qaNewForm.question = $event.target.value; clearNewErr('qa-new-question')" size="md" rows="4" required></cw-textarea>
+              <cw-field-errors slot="errors" for="qa-new-question" size="md"></cw-field-errors>
+            </cw-field-group>
+            <div class="flex flex-col items-start gap-4 rounded bg-specter-400 p-4">
+              <div class="grid w-full grid-cols-2 gap-4">
+                <cw-field-group size="md">
+                  <label slot="label">First name</label>
+                  <cw-input id="qa-new-firstname" :value="qaNewForm.firstName" @input="qaNewForm.firstName = $event.target.value; clearNewErr('qa-new-firstname')" size="md" required></cw-input>
+                  <cw-field-errors slot="errors" for="qa-new-firstname" size="md"></cw-field-errors>
+                </cw-field-group>
+                <cw-field-group size="md">
+                  <label slot="label">Last name</label>
+                  <cw-input id="qa-new-lastname" :value="qaNewForm.lastName" @input="qaNewForm.lastName = $event.target.value; clearNewErr('qa-new-lastname')" size="md" required></cw-input>
+                  <cw-field-errors slot="errors" for="qa-new-lastname" size="md"></cw-field-errors>
+                </cw-field-group>
+              </div>
+              <cw-field-group size="md" class="w-full">
+                <label slot="label">Company</label>
+                <cw-input id="qa-new-company" :value="qaNewForm.company" @input="qaNewForm.company = $event.target.value; clearNewErr('qa-new-company')" size="md" required></cw-input>
+                <cw-field-errors slot="errors" for="qa-new-company" size="md"></cw-field-errors>
+              </cw-field-group>
+              <cw-field-group size="md" class="w-full">
+                <label slot="label">Phone</label>
+                <cw-input id="qa-new-phone" :value="qaNewForm.phone" @input="qaNewForm.phone = $event.target.value; clearNewErr('qa-new-phone')" size="md" type="tel" required></cw-input>
+                <cw-field-errors slot="errors" for="qa-new-phone" size="md"></cw-field-errors>
+              </cw-field-group>
+            </div>
+          </div>
+        </template>
+
+        <!-- ── AGENCY EDIT LIST ── -->
+        <template v-if="qaView === 'edit-list'">
+          <cw-input-search :value="qaSearch" @input="qaSearch = $event.target.value" placeholder="Search questions" size="md" width="fill"></cw-input-search>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs text-secondary">
+              <span>{{ qaCountLabel }}</span>
+              <cw-toggle :checked.prop="qaFilterUnanswered" @change="qaFilterUnanswered = !qaFilterUnanswered"
+                size="sm" layout="left" content="Unanswered"></cw-toggle>
+            </div>
+            <div class="flex flex-col -mx-6">
+              <div v-for="item in filteredQuestions" :key="item.id"
+                class="flex items-center gap-3 border-b border-specter-500 px-6 py-4 cursor-pointer"
+                :class="qaSelectedIds.includes(item.id) ? 'bg-azul-50' : 'hover:bg-specter-50'"
+                @click="qaSelectedIds.includes(item.id) ? qaSelectedIds = qaSelectedIds.filter(id => id !== item.id) : qaSelectedIds.push(item.id)">
+                <cw-checkbox size="md"
+                  :checked.prop="qaSelectedIds.includes(item.id)"
+                  @click.stop
+                  @change="qaSelectedIds.includes(item.id) ? qaSelectedIds = qaSelectedIds.filter(id => id !== item.id) : qaSelectedIds.push(item.id)">
+                </cw-checkbox>
+                <div class="relative flex min-w-0 grow flex-col gap-1">
+                  <cw-indicator v-if="item.unread" size="md" status="notice" theme="white"
+                    class="absolute -left-5 top-0"></cw-indicator>
+                  <span class="h-5 truncate text-sm font-medium leading-5">{{ item.subject }}</span>
+                  <p class="leading-4 text-xs text-secondary line-clamp-2">{{ item.question }}</p>
+                </div>
+                <div class="flex shrink-0 self-stretch flex-col items-end gap-1.5 pt-[2px]">
+                  <div class="shrink-0 flex flex-col items-start">
+                    <cw-tag v-if="qaShowTag(item) === 'answered'" content="Answered" theme="emerald" size="sm"></cw-tag>
+                    <cw-tag v-else-if="qaShowTag(item) === 'pending'" content="Pending" theme="amber" size="sm"></cw-tag>
+                    <cw-tag v-else-if="qaShowTag(item) === 'draft'" content="Draft" theme="specter" size="sm"></cw-tag>
+                    <span v-else class="whitespace-nowrap text-right text-xs text-secondary">{{ qaTimeLabel(item) }}</span>
+                  </div>
+                  <div class="shrink-0 flex flex-col items-end justify-end text-xs text-secondary">
+                    <p class="text-right">{{ item.call }}</p>
+                    <p class="text-right">Q# {{ item.index }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-if="filteredQuestions.length === 0" class="flex items-center justify-center py-12">
+              <cw-empty-state content="No questions found" type="text"></cw-empty-state>
+            </div>
+          </div>
+        </template>
+
+        <!-- ── AGENCY EDIT QUESTION ── -->
+        <template v-if="qaView === 'edit-question' && qaActiveQ">
+          <!-- Proposal (read-only) -->
+          <cw-field-group size="md">
+            <label slot="label">Proposal</label>
+            <cw-input value="Call 001 | B1CBA2601372-0" size="md" readonly style="max-width:320px"></cw-input>
+          </cw-field-group>
+          <!-- Q# + submitted timestamp -->
+          <div class="flex items-baseline gap-3">
+            <span class="text-sm font-semibold">Question # {{ qaActiveQ.index }}</span>
+            <span class="text-xs text-secondary">{{ qaActiveQ.submittedAt }}</span>
+          </div>
+          <!-- Subject -->
+          <cw-field-group size="md">
+            <label slot="label">Subject</label>
+            <cw-input :value="qaEditForm.subject" @input="qaEditForm.subject = $event.target.value" size="md" required></cw-input>
+          </cw-field-group>
+          <!-- Question -->
+          <cw-field-group size="md">
+            <label slot="label">Question</label>
+            <cw-textarea :value="qaEditForm.question" @input="qaEditForm.question = $event.target.value" size="md" required rows="3"></cw-textarea>
+          </cw-field-group>
+          <!-- Submitter attribution -->
+          <div class="flex items-center gap-2 text-xs text-secondary -mt-2">
+            <cw-icon-person size="sm"></cw-icon-person>
+            <span>{{ qaActiveQ.submitter.name }}</span>
+            <template v-if="qaActiveQ.submitter.company">
+              <span class="text-specter-400">•</span>
+              <span>{{ qaActiveQ.submitter.company }}</span>
+            </template>
+            <template v-if="qaActiveQ.submitter.phone">
+              <span class="text-specter-400">•</span>
+              <span>{{ qaActiveQ.submitter.phone }}</span>
+            </template>
+          </div>
+          <!-- Answer -->
+          <cw-field-group size="md">
+            <label slot="label">Answer</label>
+            <cw-textarea :value="qaEditForm.answer" @input="qaEditForm.answer = $event.target.value" size="md" rows="4" placeholder="Enter answer here..."></cw-textarea>
+          </cw-field-group>
+          <cw-callout v-if="qaEditError" type="error" size="md" :content="qaEditError"></cw-callout>
+          <!-- Visible + Assign controls -->
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-4">
+              <cw-checkbox id="qa-edit-visible" content="Visible" size="md"
+                :checked.prop="qaEditForm.visible"
+                @change="qaEditForm.visible = $event.target.checked; if($event.target.checked){ qaEditShowAssign = false; qaEditForm.assignedTo = '' } qaEditError = ''">
+              </cw-checkbox>
+              <!-- Timestamp: only if visible was already true when form was opened (i.e. previously saved as visible) -->
+              <span v-if="qaEditForm.visible && qaEditWasVisible && qaActiveQ.answeredAt"
+                class="text-xs text-secondary flex-1 text-right">
+                Shown as {{ qaActiveQ.answeredBy }} on {{ qaActiveQ.answeredAt }}
+              </span>
+              <!-- Assign/Remove — only available when Visible is unchecked -->
+              <template v-if="!qaEditForm.visible">
+                <cw-button v-if="!qaEditShowAssign" theme="secondary" appearance="outlined" size="sm"
+                  @click="qaEditShowAssign = true">
+                  <cw-icon-person slot="icon-left" size="sm"></cw-icon-person>
+                  Assign
+                </cw-button>
+                <cw-button v-else theme="secondary" appearance="outlined" size="sm"
+                  @click="qaEditShowAssign = false; qaEditForm.assignedTo = ''">
+                  <cw-icon-clear slot="icon-left" size="sm"></cw-icon-clear>
+                  Remove assignment
+                </cw-button>
+              </template>
+            </div>
+            <!-- Assigned to — progressive reveal -->
+            <cw-field-group v-if="qaEditShowAssign && !qaEditForm.visible" size="md">
+              <label slot="label">Assigned to</label>
+              <cw-select :value.prop="qaEditForm.assignedTo" @change="qaEditForm.assignedTo = $event.target.value"
+                size="md" width="fill" strategy="fixed" clearable placeholder="Select...">
+                <cw-select-option content="Dana Reyes" caption="Q&amp;A Coordinator" value="Dana Reyes" size="md" layout="inline"></cw-select-option>
+                <cw-select-option content="Pat Morrison" caption="Agency Administrator" value="Pat Morrison" size="md" layout="inline"></cw-select-option>
+                <cw-select-option content="Chris Holloway" caption="Project Manager" value="Chris Holloway" size="md" layout="inline"></cw-select-option>
+              </cw-select>
+              <span slot="help">Assigned questions are set to Pending to the public</span>
+            </cw-field-group>
+          </div>
+        </template>
+
+      </div>
+
+      <!-- Footer: new question -->
+      <cw-button v-if="qaView === 'new'" slot="actions-footer"
+        theme="secondary" appearance="filled" class="flex-1" @click="cancelNewQuestion()">Cancel</cw-button>
+      <cw-button v-if="qaView === 'new'" slot="actions-footer"
+        theme="primary" appearance="filled" class="flex-1" @click="submitNewQuestion()">Submit</cw-button>
+      <!-- Footer: edit-list -->
+      <cw-button v-if="qaView === 'edit-list'" slot="actions-footer"
+        theme="destructive" appearance="filled" class="flex-1" :disabled="qaSelectedIds.length === 0"
+        @click="removeSelectedQuestions()">Remove selected</cw-button>
+      <cw-button v-if="qaView === 'edit-list'" slot="actions-footer"
+        theme="secondary" appearance="filled" class="flex-1" @click="exitForm('list')">Cancel</cw-button>
+      <!-- Footer: edit-question -->
+      <cw-button v-if="qaView === 'edit-question'" slot="actions-footer"
+        theme="secondary" appearance="filled" class="flex-1" @click="exitForm('question')">Cancel</cw-button>
+      <cw-button v-if="qaView === 'edit-question'" slot="actions-footer"
+        theme="primary" appearance="filled" class="flex-1" @click="saveEditQuestion()">Save</cw-button>
+
+    </cw-slideout>
+
+  </div>
+
+  <script>
+    const { createApp, ref, computed, nextTick } = Vue
+
+    const app = createApp({
+      setup() {
+        // ── Proposal items ────────────────────────────────────────────────
+        const viewMode = ref('agency')
+        const favoritesOnly = ref(false)
+
+        const roadwayItems = ref([
+          { line: 'Line 0005', code: '150-1000', description: 'TRAFFIC CONTROL - 0016920', qty: 1,    unit: 'LS', starred: true  },
+          { line: 'Line 0010', code: '156-0100', description: 'GPS DATA COLLECTION AND SUBMITTAL', qty: 1, unit: 'LS', starred: false },
+          { line: 'Line 0015', code: '163-0232', description: 'TEMPORARY GRASSING', qty: 1, unit: 'AC', starred: false },
+          { line: 'Line 0020', code: '163-0240', description: 'MULCH', qty: 8, unit: 'TN', starred: false },
+          { line: 'Line 0025', code: '163-0301', description: 'CONSTRUCT AND REMOVE CONSTRUCTION EXITS', qty: 10, unit: 'EA', starred: false },
+          { line: 'Line 0030', code: '163-0503', description: 'CONSTRUCT AND REMOVE SILT CONTROL GATE, TP 3', qty: 2, unit: 'EA', starred: false },
+          { line: 'Line 0035', code: '163-0520', description: 'CONSTRUCT AND REMOVE TEMPORARY PIPE SLOPE DRAIN', qty: 100, unit: 'LF', starred: false },
+          { line: 'Line 0040', code: '163-0527', description: 'CONSTRUCT AND REMOVE RIP RAP CHECK DAMS, STONE PLAIN RIP RAP/SAND BAGS', qty: 10, unit: 'EA', starred: false },
+          { line: 'Line 0045', code: '163-0529', description: 'CONSTRUCT AND REMOVE TEMPORARY SEDIMENT BARRIER OR BALED STRAW CHECK DAM', qty: 300, unit: 'LF', starred: false },
+          { line: 'Line 0050', code: '163-0550', description: 'CONSTRUCT AND REMOVE INLET SEDIMENT TRAP', qty: 33, unit: 'EA', starred: false },
+          { line: 'Line 0055', code: '165-0030', description: 'MAINTENANCE OF TEMPORARY SILT FENCE, TP C', qty: 1400, unit: 'LF', starred: false },
+          { line: 'Line 0060', code: '165-0041', description: 'MAINTENANCE OF CHECK DAMS - ALL TYPES', qty: 300, unit: 'LF', starred: false },
+        ])
+
+        const drainageItems = ref([
+          { line: 'Line 0145', code: '430-0210', description: 'PIPE, CULVERT, 18 IN., CLASS III, R.C.', qty: 48, unit: 'LF', starred: false },
+          { line: 'Line 0150', code: '430-0215', description: 'PIPE, CULVERT, 24 IN., CLASS III, R.C.', qty: 72, unit: 'LF', starred: false },
+          { line: 'Line 0155', code: '441-0050', description: 'CATCH BASIN, TYPE A', qty: 2, unit: 'EA', starred: false },
+          { line: 'Line 0160', code: '441-0100', description: 'MANHOLE, TYPE A', qty: 1, unit: 'EA', starred: false },
+          { line: 'Line 0165', code: '446-0220', description: 'END SECTION, CONC., 18 IN.', qty: 4, unit: 'EA', starred: false },
+          { line: 'Line 0170', code: '500-3801', description: 'GRADED AGGREGATE BASE, GR. 4, 4 IN.', qty: 352, unit: 'SY', starred: false },
+        ])
+
+        const totalItems = roadwayItems.value.length + drainageItems.value.length
+
+        const filteredRoadway = computed(() =>
+          favoritesOnly.value ? roadwayItems.value.filter(i => i.starred) : roadwayItems.value
+        )
+        const filteredDrainage = computed(() =>
+          favoritesOnly.value ? drainageItems.value.filter(i => i.starred) : drainageItems.value
+        )
+        const itemCountLabel = computed(() => {
+          if (!favoritesOnly.value) return `${totalItems} items`
+          const visible = filteredRoadway.value.length + filteredDrainage.value.length
+          return `${visible} of ${totalItems} items`
+        })
+
+        // ── Q&A state ────────────────────────────────────────────────────
+        const qaView = ref('list')
+        const qaActiveQ = ref(null)
+        const qaSearch = ref('')
+        const qaFilterUnread = ref(false)
+        const qaFilterUnanswered = ref(false)
+        const qaSelectedIds = ref([])
+        const qaRemovedCount = ref(0)
+
+        const qaNewForm = ref({ subject: '', question: '', firstName: 'Marcus', lastName: 'Webb', company: 'Webb Construction', phone: '' })
+        const qaEditingId = ref(null)
+        const qaEditForm = ref({ subject: '', question: '', answer: '', visible: false, assignedTo: '' })
+        const qaEditError = ref('')
+        const qaEditShowAssign = ref(false)
+        const qaEditWasVisible = ref(false)
+        const qaPreviousState = ref(null)
+
+        const questions = ref([
+          {
+            id: 1, subject: 'Pavement marking type substitution',
+            question: 'The plans specify Type II pavement markings throughout. Can thermoplastic Type I be substituted given the reduced traffic volumes expected during Phase 1?',
+            status: 'answered', unread: false,
+            answer: 'Yes, Type I thermoplastic markings are acceptable for Phase 1 with agency approval. Submit Form 1234 prior to installation.',
+            visible: true, assignedTo: null, answeredBy: 'Dana Reyes', answeredAt: '5/9/26 at 10:30AM EDT',
+            submitter: { name: 'Marcus Webb', company: 'Webb Construction', phone: '(404) 555-0123' },
+            submittedAt: '5/7/26 at 9:14AM EDT', submittedDate: '2026-05-07', call: 'Call 001', proposal: 'B1CBA2601372-0', index: 1, total: 5
+          },
+          {
+            id: 2, subject: 'Drainage pipe material alternative',
+            question: 'Section 0150 calls for 24-inch Class III R.C. pipe. Is HDPE an acceptable alternative given current lead times on R.C. pipe?',
+            status: 'pending', unread: true, answer: '', visible: false, assignedTo: 'Dana Reyes', assignedAt: '5/14/26 at 2:15PM EDT',
+            submitter: { name: 'Priya Nair', company: 'Nair Civil', phone: '(678) 555-0456' },
+            submittedAt: '5/7/26 at 11:02AM EDT', submittedDate: '2026-05-07', call: 'Call 001', proposal: 'B1CBA2601372-0', index: 2, total: 5
+          },
+          {
+            id: 3, subject: 'Traffic control phasing clarification',
+            question: 'Can you confirm whether temporary signalization will be required at West Hancock Ave during Phase 2, given that the Traffic Control plan shows two-way traffic maintained on SR 10 throughout?',
+            status: 'unanswered', unread: true, answer: '', visible: false, assignedTo: null,
+            submitter: { name: 'Jordan Ellis', company: 'Ellis Group', phone: '(770) 555-0789' },
+            submittedAt: '5/8/26 at 2:30PM EDT', submittedDate: '2026-05-08', call: 'Call 001', proposal: 'B1CBA2601372-0', index: 3, total: 5
+          },
+          {
+            id: 4, subject: 'Temporary erosion control specs',
+            question: 'Item 163-0527 calls for rip rap check dams. Are sand bags alone acceptable as an equivalent BMP given the limited drainage areas involved?',
+            status: 'draft', unread: false,
+            answer: 'Sand bags may be used as an equivalent BMP for rip rap check dams in drainage areas under 2 acres, provided they are installed per GSWCC Level II standards and inspected weekly.',
+            visible: false, assignedTo: null, answeredBy: 'Harold McAfee', answeredAt: '5/16/26 at 9:22AM EDT',
+            submitter: { name: 'Marcus Webb', company: 'Webb Construction', phone: '(404) 555-0123' },
+            submittedAt: '5/8/26 at 3:45PM EDT', submittedDate: '2026-05-08', call: 'Call 001', proposal: 'B1CBA2601372-0', index: 4, total: 5
+          },
+          {
+            id: 5, subject: 'Roundabout lane width variance',
+            question: 'The design shows a 14-foot entry lane width. Is a 12-foot entry lane acceptable for this roundabout given the low truck volumes? GDOT design policy typically allows 12-foot minimum.',
+            status: 'draft', unread: false,
+            answer: 'A 12-foot entry lane width is acceptable for this location given the documented low truck volumes. Please confirm compliance with GDOT Design Policy Manual Table 6-3 and include a design exception request in the bid documents.',
+            visible: false, assignedTo: null, answeredBy: 'Dana Reyes', answeredAt: '5/17/26 at 11:45AM EDT',
+            submitter: { name: 'Priya Nair', company: 'Nair Civil', phone: '(678) 555-0456' },
+            submittedAt: '5/8/26 at 4:10PM EDT', submittedDate: '2026-05-08', call: 'Call 001', proposal: 'B1CBA2601372-0', index: 5, total: 5
+          },
+        ])
+
+        const filteredQuestions = computed(() => {
+          let list = questions.value
+          if (qaSearch.value) {
+            const s = qaSearch.value.toLowerCase()
+            list = list.filter(q => q.subject.toLowerCase().includes(s) || q.question.toLowerCase().includes(s))
+          }
+          if (viewMode.value === 'contractor' && qaFilterUnread.value) list = list.filter(q => q.status === 'answered')
+          if (viewMode.value === 'agency' && qaFilterUnanswered.value) list = list.filter(q => q.status !== 'answered')
+          return [...list].sort((a, b) =>
+            b.submittedDate.localeCompare(a.submittedDate) || b.index - a.index
+          )
+        })
+
+        const qaActivePosition = computed(() =>
+          qaActiveQ.value ? questions.value.findIndex(q => q.id === qaActiveQ.value.id) : -1
+        )
+
+        const isBrowseView = computed(() => qaView.value === 'list' || qaView.value === 'question')
+
+        const isOwnQuestion = computed(() => {
+          if (!qaActiveQ.value) return false
+          const myName = `${qaNewForm.value.firstName} ${qaNewForm.value.lastName}`
+          return qaActiveQ.value.submitter?.name === myName
+        })
+
+        const qaCountLabel = computed(() => {
+          const total = questions.value.length
+          const filtered = filteredQuestions.value.length
+          const removed = qaRemovedCount.value
+          const isFiltered = filtered < total
+          const base = isFiltered ? `${filtered} of ${total} questions` : `${total} questions`
+          return (!isFiltered && removed > 0) ? `${base} (${removed} removed)` : base
+        })
+
+        // ── Q&A helpers ──────────────────────────────────────────────────
+        function openQA() {
+          qaView.value = 'list'
+          document.querySelector('#qa-slideout')?.open()
+        }
+
+        function enterForm(view) {
+          qaPreviousState.value = { view: qaView.value, activeQ: qaActiveQ.value }
+          qaView.value = view
+          document.querySelector('#qa-slideout')?.close()
+          nextTick(() => document.querySelector('#qa-slideout-form')?.open())
+        }
+
+        function cancelNewQuestion() {
+          qaEditingId.value = null
+          clearAllNewErrs()
+          const prev = qaPreviousState.value
+          if (prev) {
+            qaActiveQ.value = prev.activeQ
+            exitForm(prev.view)
+          } else {
+            exitForm('list')
+          }
+        }
+
+        function exitForm(returnView) {
+          qaView.value = returnView || 'list'
+          document.querySelector('#qa-slideout-form')?.close()
+          nextTick(() => document.querySelector('#qa-slideout')?.open())
+        }
+
+        function selectQuestion(q) {
+          qaActiveQ.value = q
+          q.unread = false
+          qaView.value = 'question'
+        }
+
+        function prevQuestion() {
+          const idx = questions.value.findIndex(q => q.id === qaActiveQ.value.id)
+          if (idx > 0) selectQuestion(questions.value[idx - 1])
+        }
+
+        function nextQuestion() {
+          const idx = questions.value.findIndex(q => q.id === qaActiveQ.value.id)
+          if (idx < questions.value.length - 1) selectQuestion(questions.value[idx + 1])
+        }
+
+        function startEditQuestion() {
+          qaEditWasVisible.value = qaActiveQ.value.visible
+          qaEditShowAssign.value = !!qaActiveQ.value.assignedTo
+          qaEditForm.value = {
+            subject: qaActiveQ.value.subject,
+            question: qaActiveQ.value.question,
+            answer: qaActiveQ.value.answer,
+            visible: qaActiveQ.value.visible,
+            assignedTo: qaActiveQ.value.assignedTo || ''
+          }
+          enterForm('edit-question')
+        }
+
+        function saveEditQuestion() {
+          qaEditError.value = ''
+          const hasAnswer = qaEditForm.value.answer.trim().length > 0
+          if (qaEditForm.value.visible && !hasAnswer) {
+            qaEditError.value = 'An answer must be provided before saving as Visible.'
+            return
+          }
+          const q = qaActiveQ.value
+          q.subject = qaEditForm.value.subject
+          q.question = qaEditForm.value.question
+          q.answer = qaEditForm.value.answer
+          q.visible = qaEditForm.value.visible
+          const newAssignee = qaEditForm.value.assignedTo || null
+          if (newAssignee && newAssignee !== q.assignedTo) {
+            const d = new Date(); const mo = d.getMonth()+1, day = String(d.getDate()).padStart(2,'0'), yy = String(d.getFullYear()).slice(-2), h = d.getHours(), min = String(d.getMinutes()).padStart(2,'0'), ampm = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12, tz = d.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop()
+            q.assignedAt = `${mo}/${day}/${yy} at ${h12}:${min}${ampm} ${tz}`
+          } else if (!newAssignee) { q.assignedAt = null }
+          q.assignedTo = newAssignee
+          if (hasAnswer && q.visible) {
+            q.status = 'answered'
+            if (!q.answeredAt) { const d = new Date(); const mo = d.getMonth()+1, day = String(d.getDate()).padStart(2,'0'), yy = String(d.getFullYear()).slice(-2), h = d.getHours(), min = String(d.getMinutes()).padStart(2,'0'), ampm = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12, tz = d.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop(); q.answeredBy = 'Harold McAfee'; q.answeredAt = `${mo}/${day}/${yy} at ${h12}:${min}${ampm} ${tz}`; }
+          } else if (hasAnswer) {
+            q.status = 'draft'
+            if (!q.answeredAt) { const d = new Date(); const mo = d.getMonth()+1, day = String(d.getDate()).padStart(2,'0'), yy = String(d.getFullYear()).slice(-2), h = d.getHours(), min = String(d.getMinutes()).padStart(2,'0'), ampm = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12, tz = d.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop(); q.answeredBy = 'Harold McAfee'; q.answeredAt = `${mo}/${day}/${yy} at ${h12}:${min}${ampm} ${tz}`; }
+          } else if (q.assignedTo) {
+            q.status = 'pending'
+          } else {
+            q.status = 'unanswered'
+          }
+          exitForm('question')
+        }
+
+        function setNewErr(id, msg) {
+          const el = document.getElementById(id)
+          if (!el) return
+          el.setAttribute('custom-error', msg)
+          el.setAttribute('touched', '')
+          el.setAttribute('form-dirty', '')
+        }
+
+        function clearNewErr(id) {
+          const el = document.getElementById(id)
+          if (!el) return
+          el.removeAttribute('custom-error')
+          el.removeAttribute('touched')
+          el.removeAttribute('form-dirty')
+        }
+
+        function clearAllNewErrs() {
+          ['qa-new-subject','qa-new-question','qa-new-firstname','qa-new-lastname','qa-new-company','qa-new-phone']
+            .forEach(clearNewErr)
+        }
+
+        function submitNewQuestion() {
+          const f = qaNewForm.value
+          const rules = [
+            { id: 'qa-new-subject',   msg: 'Subject is required.',    invalid: !f.subject.trim() },
+            { id: 'qa-new-question',  msg: 'Question is required.',   invalid: !f.question.trim() },
+            { id: 'qa-new-firstname', msg: 'First name is required.', invalid: !f.firstName.trim() },
+            { id: 'qa-new-lastname',  msg: 'Last name is required.',  invalid: !f.lastName.trim() },
+            { id: 'qa-new-company',   msg: 'Company is required.',    invalid: !f.company.trim() },
+            { id: 'qa-new-phone',     msg: 'Phone is required.',      invalid: !f.phone.trim() },
+          ]
+          rules.forEach(r => r.invalid ? setNewErr(r.id, r.msg) : clearNewErr(r.id))
+          if (rules.some(r => r.invalid)) return
+          const resetForm = () => {
+            qaNewForm.value = { subject: '', question: '', firstName: 'Marcus', lastName: 'Webb', company: 'Webb Construction', phone: '' }
+            clearAllNewErrs()
+          }
+          if (qaEditingId.value) {
+            // Update existing question
+            const q = questions.value.find(q => q.id === qaEditingId.value)
+            if (q) {
+              q.subject = qaNewForm.value.subject || q.subject
+              q.question = qaNewForm.value.question
+              q.submitter = { name: `${qaNewForm.value.firstName} ${qaNewForm.value.lastName}`, company: qaNewForm.value.company, phone: qaNewForm.value.phone }
+            }
+            qaEditingId.value = null
+            resetForm()
+            exitForm('question')
+          } else {
+            // Create new question
+            const nextIndex = Math.max(0, ...questions.value.map(q => q.index)) + 1
+            const newQ = {
+              id: Date.now(),
+              subject: qaNewForm.value.subject || 'New question',
+              question: qaNewForm.value.question,
+              status: 'draft', unread: false, answer: '', visible: false, assignedTo: null,
+              submitter: { name: `${qaNewForm.value.firstName} ${qaNewForm.value.lastName}`, company: qaNewForm.value.company, phone: qaNewForm.value.phone },
+              submittedAt: (() => { const d = new Date(); const m = d.getMonth()+1, day = String(d.getDate()).padStart(2,'0'), yy = String(d.getFullYear()).slice(-2), h = d.getHours(), min = String(d.getMinutes()).padStart(2,'0'), ampm = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12, tz = d.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop(); return `${m}/${day}/${yy} at ${h12}:${min}${ampm} ${tz}`; })(),
+              submittedDate: new Date().toISOString().slice(0, 10),
+              call: 'Call 001', proposal: 'B1CBA2601372-0', index: nextIndex
+            }
+            questions.value.push(newQ)
+            qaActiveQ.value = newQ
+            resetForm()
+            exitForm('question')
+          }
+        }
+
+        function editOwnQuestion() {
+          const q = qaActiveQ.value
+          const nameParts = q.submitter.name.split(' ')
+          qaNewForm.value = {
+            subject: q.subject,
+            question: q.question,
+            firstName: nameParts[0] || '',
+            lastName: nameParts.slice(1).join(' ') || '',
+            company: q.submitter.company || '',
+            phone: q.submitter.phone || ''
+          }
+          qaEditingId.value = q.id
+          enterForm('new')
+        }
+
+        function removeSelectedQuestions() {
+          qaRemovedCount.value += qaSelectedIds.value.length
+          questions.value = questions.value.filter(q => !qaSelectedIds.value.includes(q.id))
+          qaSelectedIds.value = []
+          exitForm('list')
+        }
+
+        function qaShowTag(item) {
+          if (item.status === 'answered') return 'answered'
+          if (item.status === 'draft') return viewMode.value === 'agency' ? 'draft' : 'pending'
+          if (item.status === 'pending') return viewMode.value === 'agency' ? null : 'pending'
+          return null
+        }
+
+        function qaTimeLabel(item) {
+          if (qaShowTag(item)) return null
+          const today = new Date().toISOString().slice(0, 10)
+          if (item.submittedDate === today) return item.submittedAt
+          const [y, m, d] = item.submittedDate.split('-')
+          return `${parseInt(m)}/${parseInt(d)}/${y.slice(2)}`
+        }
+
+        return {
+          viewMode, favoritesOnly, roadwayItems, drainageItems,
+          filteredRoadway, filteredDrainage, itemCountLabel,
+          qaView, qaActiveQ, qaSearch, qaFilterUnread, qaFilterUnanswered,
+          qaSelectedIds, qaNewForm, qaEditForm,
+          questions, filteredQuestions, qaCountLabel, qaActivePosition, qaRemovedCount, isOwnQuestion, isBrowseView,
+          qaEditError, qaEditShowAssign, qaEditWasVisible,
+          openQA, enterForm, exitForm, cancelNewQuestion, selectQuestion, prevQuestion, nextQuestion,
+          startEditQuestion, saveEditQuestion, submitNewQuestion, editOwnQuestion, removeSelectedQuestions,
+          clearNewErr,
+          qaShowTag, qaTimeLabel
+        }
+      }
+    })
+
+    app.config.compilerOptions.isCustomElement = tag => tag.startsWith('cw-')
+    app.mount('#app')
+  </script>
+
+  <!--
+  CAUSEWAY COMPONENTS USED
+  ─────────────────────────
+  cw-bidx-app-layout, cw-bidx-agency-picker-item
+  cw-bidx-proposal-item-section, cw-bidx-proposal-item
+  cw-app-menu-item
+  cw-breadcrumbs, cw-breadcrumb
+  cw-segmented-switches, cw-segmented-switch
+  cw-button, cw-badge, cw-tag, cw-toggle
+  cw-input-search, cw-select, cw-select-option
+  cw-dropdown-menu-group, cw-dropdown-menu-item
+  cw-icon-view-dashboard, cw-icon-federal, cw-icon-calendar, cw-icon-magnify,
+  cw-icon-line-chart, cw-icon-analytics-alt, cw-icon-group, cw-icon-admin,
+  cw-icon-open-in-new, cw-icon-star, cw-icon-star-outline,
+  cw-icon-bookmark, cw-icon-bookmark-outline,
+  cw-icon-arrow-alt-right, cw-icon-download, cw-icon-split, cw-icon-caret-down,
+  cw-icon-sort-desc, cw-icon-sparkles
+
+  Causeway version: 1.94.1
+  Bundle: https://bcdn.infotechinc.com/causeway/v1.94.1/all.umd.js
+  -->
+</body>
+</html>

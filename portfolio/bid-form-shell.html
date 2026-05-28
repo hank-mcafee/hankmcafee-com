@@ -1,0 +1,2921 @@
+<!--
+  BID FORM PROTOTYPE — TEMPLATE
+  ─────────────────────────────────────────────────────────────────────────────
+  This file is the agency-agnostic template. To create an agency-specific
+  prototype, copy this file and update the AGENCY CONFIGURATION block at the
+  top of setup() in the <script> section below. Do not modify anything outside
+  that block unless the change applies to all agencies.
+
+  Agency-specific structural overrides in the HTML are marked with:
+    [AGENCY] Description of what and why
+
+  TEMPLATE DEFAULTS
+    Agency abbr : DOTABBV
+    Agency name : Statename Department of Transportation
+    Item assign : enabled
+    Bond goal   : 10.00%
+    Vendor goals: DBE 5.00%, SBE 3.00%
+  ─────────────────────────────────────────────────────────────────────────────
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bid Express — Bid Form</title>
+  <style>[v-cloak] { display: none !important; }</style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://assets.infotechinc.com/causeway-sdk/v1.93.0-alpha.2/tailwind-preset.umd.js"></script>
+  <script>tailwind.config = { presets: [CausewayTailwindPreset] }</script>
+  <script src="https://bcdn.infotechinc.com/causeway/v1.93.0-alpha.2/all.umd.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <style type="text/tailwindcss">
+    @layer base {
+      html, body { @apply min-h-full h-full; }
+      body { @apply bg-specter-200 text-primary; -webkit-font-smoothing: antialiased; }
+      small { @apply text-sm; }
+      h1, h2, h3, h4, h5, h6 { @apply leading-tight; }
+      h1 { font-size: 2em; }
+      h2 { font-size: 1.5em; }
+      h3 { font-size: 1.25em; }
+    }
+  </style>
+  <style type="text/tailwindcss">
+
+    /* ─── Main content wrapper ────────────────────────────────── */
+    .bid-content-area {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+      @apply bg-specter-300;
+    }
+    @media print {
+      .bid-content-area { overflow: visible; height: auto; }
+    }
+
+    /* ─── Page section card ───────────────────────────────────── */
+    cw-radio-group, cw-checkbox-group { padding-top: 6px; padding-bottom: 6px; }
+
+    .bid-section {
+      @apply bg-specter-50;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      max-width: 1280px;
+    }
+    @media (min-width: 640px) {
+      .bid-section { padding: 2rem; }
+    }
+    @media (min-width: 768px) {
+      .bid-section {
+        margin-right: 1.5rem;
+        margin-top: 1.5rem;
+        border-radius: 0.375rem;
+        @apply shadow;
+      }
+    }
+
+    /* ─── Bidder panel ────────────────────────────────────────── */
+    .bidder-box {
+      @apply bg-azul-50;
+      border-radius: 0.25rem;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .digital-id-bar {
+      @apply bg-azul-700 text-azul-100;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0.75rem;
+    }
+    .bidder-info {
+      padding: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem 2.5rem;
+    }
+
+    /* ─── Proposal details ───────────────────────────────────── */
+    .proposal-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0 2rem;
+      margin-bottom: 1rem;
+    }
+    .proposal-detail-set {
+      flex: 1 0 0;
+      min-width: 200px;
+    }
+    .proposal-detail-row {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      padding: 3px 0;
+    }
+    .proposal-detail-label {
+      font-size: 0.875rem;
+      @apply text-secondary;
+    }
+    .proposal-detail-value {
+      font-size: 0.875rem;
+      @apply text-primary;
+      font-weight: 500;
+    }
+    .proposal-description {
+      font-size: 0.875rem;
+      @apply text-primary;
+      margin-bottom: 1.5rem;
+    }
+    /* ─── Auto withdrawal ────────────────────────────────────── */
+    .auto-withdrawal {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* ─── Proposal legal text ─────────────────────────────────── */
+    .proposal-legal-heading {
+      text-align: center;
+      font-size: 0.75rem; /* text-xs */
+      font-weight: 700;
+      @apply text-secondary;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    .proposal-legal p {
+      font-size: 0.875rem; /* text-sm */
+      @apply text-secondary;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ─── Section page header ─────────────────────────────────── */
+    .portion-title {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+    }
+    .portion-title-main {
+      flex: 1 0 0;
+      min-width: 168px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .portion-title-heading {
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 2rem;
+      @apply text-primary;
+    }
+    .portion-title-subhead {
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.25rem;
+      @apply text-secondary;
+    }
+    .portion-title-corner {
+      flex-shrink: 0;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      @apply text-secondary;
+      text-align: right;
+      white-space: nowrap;
+      max-width: 256px;
+      min-width: 168px;
+    }
+
+    /* ─── Vendor list ─────────────────────────────────────────── */
+    .vendor-dbe-summary {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      border: 1px solid theme('colors.specter.400');
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .vendor-dbe-text { display: flex; flex-direction: column; }
+    .vendor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.625rem 0;
+      border-bottom: 1px solid theme('colors.specter.400');
+      margin-bottom: 1rem;
+      font-size: 0.875rem; /* text-sm */
+      @apply text-secondary;
+    }
+    .vendor-quote-note {
+      text-align: center;
+      font-size: 0.875rem; /* text-sm */
+      @apply text-midnight-300;
+      margin-bottom: 1.5rem;
+    }
+    .vendor-instructions h3 {
+      font-size: 0.875rem; /* text-sm */
+      font-weight: 700;
+      @apply text-primary;
+      margin-bottom: 0.5rem;
+    }
+    .vendor-instructions p {
+      font-size: 0.875rem; /* text-sm */
+      @apply text-secondary;
+      margin-bottom: 0.75rem;
+      line-height: 1.55;
+    }
+
+
+    /* ─── Page nav buttons ────────────────────────────────────── */
+    .bid-page-nav {
+      display: flex;
+      flex: 1;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0 1.5rem 2rem;
+      max-width: 1280px;
+    }
+    @media (min-width: 768px) {
+      .bid-page-nav { margin-right: 1.5rem; }
+    }
+    /* ─── Mobile check verification block transition ─────────── */
+    .mobile-check-enter-active,
+    .mobile-check-leave-active {
+      transition: opacity 0.2s ease, max-height 0.25s ease;
+      max-height: 80px;
+      overflow: hidden;
+    }
+    .mobile-check-enter-from,
+    .mobile-check-leave-to {
+      opacity: 0;
+      max-height: 0;
+    }
+
+    /* ─── Context bar expand/collapse transition ─────────────── */
+    .ctx-expand-enter-active,
+    .ctx-expand-leave-active {
+      transition: opacity 0.2s ease, max-height 0.25s ease;
+      max-height: 120px;
+      overflow: hidden;
+    }
+    .ctx-expand-enter-from,
+    .ctx-expand-leave-to {
+      opacity: 0;
+      max-height: 0;
+    }
+
+    [data-active-error] {
+      outline: 2px solid theme('colors.azul.500');
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    cw-radio-group[custom-error][touched][form-dirty]:not([data-active-error]),
+    cw-checkbox-group[custom-error][touched][form-dirty]:not([data-active-error]) {
+      outline: 2px solid theme('colors.cinnabar.500');
+      outline-offset: 4px;
+      border-radius: 4px;
+    }
+    @media print {
+      body.print-amendments #app > *:not(#amendments-print-target) { display: none !important; }
+      body.print-amendments #amendments-print-target { display: block !important; }
+    }
+    #amendments-print-target { display: none; }
+  </style>
+</head>
+<body>
+<div id="app" v-cloak class="flex flex-col h-full overflow-hidden print:h-auto print:overflow-visible">
+
+    <!-- ═══ Header: sticky top, full-width ══════════════════════════ -->
+    <div class="shrink-0 relative z-20 print:hidden">
+      <div class="shadow relative z-[1]">
+      <cw-app-header
+        theme="infotech"
+        brand-href="#"
+>
+
+        <a slot="brand" class="hidden sm:block" href="#">
+          <div class="h-8">
+            <img class="h-full" alt="Bid Express logo" src="https://assets.infotechinc.com/causeway/logos/bidx-normalized.svg">
+          </div>
+        </a>
+
+        <div slot="left" class="flex h-full items-center gap-2">
+          <!-- File menu -->
+          <cw-button id="file-trigger" theme="secondary" appearance="ghost" content="File" size="md"></cw-button>
+          <!-- Tools menu -->
+          <cw-button id="tools-trigger" theme="secondary" appearance="ghost" content="Tools" size="md"></cw-button>
+          <!-- Help link -->
+          <cw-button theme="secondary" appearance="ghost" content="Help" size="md" href="https://bidx-help.zendesk.com/hc/en-us/categories/27982987898775-Contractor" target="_blank"></cw-button>
+          <!-- Check button -->
+          <cw-button class="hidden md:block" theme="secondary" appearance="ghost" content="Check" size="md" @click="runCheck">
+            <cw-icon-check slot="icon-left"></cw-icon-check>
+          </cw-button>
+          <!-- Submit — ghost primary gives blue text without fill, matching reference -->
+          <cw-button class="hidden md:block" theme="primary" appearance="ghost" content="Submit" size="md" @click="openSubmitSlideout">
+            <cw-icon-lightning slot="icon-left"></cw-icon-lightning>
+          </cw-button>
+        </div>
+
+        <div slot="right" class="flex items-center gap-3">
+          <cw-tag content="Draft" theme="midnight" size="sm"></cw-tag>
+          <span class="hidden sm:block text-base font-semibold text-secondary">{{ completionLabel }}</span>
+          <cw-button v-if="bidSubmitted" theme="secondary" appearance="outlined" size="sm" content="Receipt"></cw-button>
+          <cw-button theme="secondary" appearance="ghost" size="md" label="Close bid form">
+            <cw-icon-clear slot="icon"></cw-icon-clear>
+          </cw-button>
+        </div>
+
+      </cw-app-header>
+      </div><!-- end shadow wrapper -->
+
+      <!-- Context bar: bid overview (collapsible) -->
+      <section aria-label="Bid overview" class="relative flex gap-x-1 bg-midnight-500 py-2.5 pl-4 pr-6 text-sm">
+        <button type="button" class="absolute inset-0 cursor-pointer"
+          :aria-label="contextExpanded ? 'Collapse overview' : 'Expand overview'"
+          @click="contextExpanded = !contextExpanded">
+        </button>
+        <div aria-hidden="true" class="absolute inset-0 pointer-events-none shadow-inner"></div>
+        <div class="pointer-events-none flex h-[20px] w-[20px] items-center justify-center text-midnight-100 transition-transform duration-200"
+          :class="{ 'rotate-90': contextExpanded }">
+          <cw-icon-chevron-right></cw-icon-chevron-right>
+        </div>
+        <div class="flex grow flex-col gap-x-6 gap-y-2 md:flex-row">
+          <!-- Left: letting details -->
+          <div class="flex flex-col gap-1">
+            <div class="flex flex-wrap gap-x-4 text-midnight-100">
+              <div>{{ agencyAbbr }}</div>
+              <div>April 30, 2027</div>
+              <div>2:00:59 PM EDT</div>
+            </div>
+            <Transition name="ctx-expand">
+              <div v-if="contextExpanded" class="text-midnight-200">
+                <div class="flex flex-wrap gap-x-4">
+                  <div>District: 4</div>
+                  <div>Letting ID: 04302027</div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+          <!-- Right: bid totals + goals — two independent columns -->
+          <div class="flex flex-col md:flex-row md:ml-auto gap-x-10 gap-y-1 text-midnight-200">
+
+            <!-- Goals column -->
+            <div class="flex flex-col gap-1">
+              <div v-if="vendorGoals.length" :class="contextExpanded ? 'flex w-52 justify-between' : 'flex gap-2 items-start whitespace-nowrap'">
+                <span class="text-midnight-200">{{ vendorGoals[0].label }} ({{ vendorGoals[0].req.toFixed(2) }}% req):</span>
+                <span class="text-midnight-100">{{ goalActualPct(vendorGoals[0]).toFixed(2) }}%</span>
+              </div>
+              <Transition name="ctx-expand">
+                <div v-if="contextExpanded && vendorGoals.length > 1" class="flex flex-col gap-1">
+                  <div v-for="goal in vendorGoals.slice(1)" :key="goal.label" class="flex w-52 justify-between">
+                    <span>{{ goal.label }} ({{ goal.req.toFixed(2) }}% req):</span>
+                    <span class="text-midnight-100">{{ goalActualPct(goal).toFixed(2) }}%</span>
+                  </div>
+                </div>
+              </Transition>
+            </div>
+
+            <!-- Totals column -->
+            <div class="flex flex-col gap-1">
+              <div :class="contextExpanded ? 'flex w-52 justify-between' : 'flex gap-2 items-start whitespace-nowrap'">
+                <span class="text-midnight-200">Bid total:</span>
+                <span class="font-semibold text-midnight-100">${{ bidTotal }}</span>
+              </div>
+              <Transition name="ctx-expand">
+                <div v-if="contextExpanded" class="flex flex-col gap-1">
+                  <div class="flex w-52 justify-between">
+                    <span>Item total:</span>
+                    <span class="text-midnight-100">${{ formatAmt(itemTotal) }}</span>
+                  </div>
+                  <div class="flex w-52 justify-between">
+                    <span>Site total:</span>
+                    <span class="text-midnight-100">${{ formatAmt(siteTotal) }}</span>
+                  </div>
+                </div>
+              </Transition>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Alert banner: shown when proposal is amended after submit -->
+      <cw-alert v-if="alertBanner" type="warning" theme="light">
+        {{ agencyAbbr }} amended this proposal. Please review and submit a replacement bid.
+        <button class="font-medium text-link" @click="openAmendmentsSlideout()">View all</button>
+      </cw-alert>
+    </div>
+
+    <!-- ═══ Submit bid slideout ═════════════════════════════════════ -->
+    <cw-slideout id="submit-bid-slideout" heading="Submit bid" no-padding size="md" footer-layout="fill" placement="right">
+
+      <!-- ── Review view ──────────────────────────────────────────── -->
+      <div v-if="submitView === 'review'" class="flex flex-col gap-4 m-6 mt-1">
+        <p class="text-xs text-secondary">{{ agencyName }}</p>
+
+        <!-- Letting info -->
+        <div class="flex flex-col gap-1 text-primary">
+          <div class="flex flex-wrap gap-1 text-sm font-medium">
+            <span>April 30, 2027</span><span>at</span><span>2:00:59 PM EDT</span>
+          </div>
+          <div class="flex gap-1 text-xs"><span class="w-16 shrink-0 text-secondary">District:</span><span>4</span></div>
+          <div class="flex gap-1 text-xs"><span class="w-16 shrink-0 text-secondary">Letting ID:</span><span>04302027</span></div>
+          <div class="flex gap-1 text-xs"><span class="w-16 shrink-0 text-secondary">Call:</span><span>030</span></div>
+          <div class="flex gap-1 text-xs"><span class="w-16 shrink-0 text-secondary">Proposal:</span><span>1173631</span></div>
+        </div>
+
+        <!-- Bid info box -->
+        <div class="overflow-clip rounded-lg border border-solid bg-specter-50"
+          :class="totalErrors > 0 ? 'border-cinnabar-300' : 'border-emerald-300'">
+          <!-- Status header -->
+          <div class="flex items-center gap-2 border-b px-3 py-2"
+            :class="totalErrors > 0 ? 'bg-cinnabar-50 border-cinnabar-200' : 'bg-emerald-50 border-emerald-200'">
+            <cw-icon-warning v-if="totalErrors > 0" class="text-cinnabar-500 shrink-0" size="sm"></cw-icon-warning>
+            <cw-icon-check-circle-outline v-else class="text-emerald-500 shrink-0" size="sm"></cw-icon-check-circle-outline>
+            <span class="text-sm">{{ totalErrors > 0 ? `${totalErrors} error${totalErrors === 1 ? '' : 's'} found` : 'No errors found' }}</span>
+          </div>
+          <!-- Bidder + bid data -->
+          <div class="p-3 flex flex-col gap-3">
+            <dl class="flex flex-col gap-2">
+              <div class="flex flex-wrap gap-x-4 items-baseline">
+                <dt class="text-xs text-secondary min-w-[64px] max-w-[80px] flex-1">Company</dt>
+                <dd class="text-sm font-medium text-primary min-w-[168px] flex-1">{{ selectedBidder ? bidderOptions.find(b => b.value === selectedBidder)?.content : 'Unknown' }}</dd>
+              </div>
+              <div class="flex flex-wrap gap-x-4 items-baseline">
+                <dt class="text-xs text-secondary min-w-[64px] max-w-[80px] flex-1">Bidder ID</dt>
+                <dd class="text-sm font-medium text-primary min-w-[168px] flex-1">1234567</dd>
+              </div>
+              <div class="flex flex-wrap gap-x-4 items-baseline">
+                <dt class="text-xs text-secondary min-w-[64px] max-w-[80px] flex-1">Digital ID</dt>
+                <dd class="text-sm font-medium text-primary min-w-[168px] flex-1">Jane Smith</dd>
+              </div>
+              <div class="flex flex-wrap gap-x-4 items-baseline">
+                <dt class="text-xs text-secondary min-w-[64px] max-w-[80px] flex-1">Bid total</dt>
+                <dd class="text-sm font-semibold text-primary min-w-[168px] flex-1">${{ bidTotal }}</dd>
+              </div>
+            </dl>
+            <!-- Attachments — placeholder, hidden until file upload is implemented -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Loading view ──────────────────────────────────────────── -->
+      <div v-else-if="submitView === 'loading'" class="flex h-full flex-col items-center justify-center gap-4 p-10 text-center">
+        <div class="flex flex-col items-center gap-2">
+          <div class="relative shrink-0" style="width:56px;height:56px;">
+            <div class="absolute" style="inset:11.36% 18.18%;">
+              <img class="absolute block inset-0 max-w-none w-full h-full" alt="" src="https://www.figma.com/api/mcp/asset/bb19af39-d82a-41c9-a734-e54ec07d218e">
+            </div>
+          </div>
+          <p class="text-2xl font-medium text-primary">Sending to {{ agencyAbbr }}</p>
+        </div>
+        <p class="text-sm text-secondary">Securely encrypting your bid…</p>
+      </div>
+
+      <!-- ── Submitted view ────────────────────────────────────────── -->
+      <div v-else-if="submitView === 'submitted'" class="flex h-full flex-col items-center justify-center gap-4 p-10 text-center">
+        <div class="flex flex-col items-center gap-2">
+          <div class="relative shrink-0" style="width:56px;height:56px;">
+            <div class="absolute" style="inset:11.36%;">
+              <img class="absolute block inset-0 max-w-none w-full h-full" alt="" src="https://www.figma.com/api/mcp/asset/b05fad87-5644-4e8c-9314-0c36d2065375">
+            </div>
+          </div>
+          <p class="text-2xl font-medium text-primary">Bid submitted</p>
+        </div>
+        <div class="flex flex-col gap-4 text-sm w-full">
+          <p class="text-primary font-medium">You can withdraw or submit a replacement any time before the letting ends.</p>
+          <div class="text-secondary leading-5">
+            <p>A receipt has been sent to:</p>
+            <p>contractor@company.com</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error view omitted for prototype -->
+
+      <!-- ── Footer ────────────────────────────────────────────────── -->
+      <div slot="actions-footer" class="flex flex-col gap-4">
+        <template v-if="submitView === 'review'">
+          <cw-field-group v-if="totalErrors > 0" layout="vertical">
+            <cw-checkbox id="submit-acknowledge-checkbox" size="sm" layout="vertical"
+              content="I understand and acknowledge that a warning or error notice was issued by Bid Express®."
+              :checked.prop="submitAcknowledged"
+              @change="onAcknowledgeChange($event.target.checked)">
+            </cw-checkbox>
+            <cw-field-errors slot="errors" for="submit-acknowledge-checkbox" size="sm"></cw-field-errors>
+          </cw-field-group>
+          <div class="flex gap-2">
+            <cw-button class="grow" theme="secondary" appearance="filled" size="md" @click="closeSubmitSlideout">Cancel</cw-button>
+            <cw-button class="grow" theme="primary" appearance="filled" size="md" @click="doSubmit"
+              :disabled.prop="submitAcknowledgeAttempted && totalErrors > 0 && !submitAcknowledged">
+              Submit
+              <cw-icon-lightning slot="icon-left" size="sm"></cw-icon-lightning>
+            </cw-button>
+          </div>
+        </template>
+        <template v-else-if="submitView === 'submitted'">
+          <div class="flex gap-2">
+            <cw-button class="grow" theme="primary" appearance="ghost" size="md" @click="submitDone">Done</cw-button>
+          </div>
+        </template>
+      </div>
+
+    </cw-slideout>
+
+    <!-- ═══ Bid errors slideout ══════════════════════════════════════ -->
+    <cw-slideout id="bid-errors-slideout" heading="Bid errors" size="md" placement="right" no-padding clickaway>
+      <div v-if="checkResults" class="p-6">
+        <div v-for="page in navItems" :key="'err-' + page.id">
+          <section v-if="checkResults.byPage[page.id] && checkResults.byPage[page.id].length > 0"
+            class="mb-4 flex flex-col gap-2 text-xs">
+            <h3 class="flex items-center justify-between gap-2 rounded bg-specter-100 px-3 py-2 text-sm font-medium">
+              {{ page.label }}
+              <cw-badge theme="cinnabar" :content="String(checkResults.byPage[page.id].length)" size="sm"></cw-badge>
+            </h3>
+            <ul class="contents">
+              <li v-for="error in checkResults.byPage[page.id]" :key="error.id"
+                class="flex items-center gap-1 pr-3">
+                <cw-icon-bullet size="sm" class="self-start"></cw-icon-bullet>
+                <div class="flex w-full gap-x-1 gap-y-2 text-cinnabar-700">
+                  <cw-icon-warning-outline size="xs" class="mt-0.5 block self-start shrink-0"></cw-icon-warning-outline>
+                  <button type="button" class="grow text-left"
+                    @click="selectErrorAndClose(error.id, page.id)">
+                    {{ error.message }}
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </cw-slideout>
+
+    <!-- ═══ Amendments slideout ══════════════════════════════════════ -->
+    <cw-slideout id="amendments-slideout" heading="Amendments" size="md" placement="right" no-padding clickaway>
+      <cw-button slot="actions-header" theme="secondary" appearance="filled" size="sm" content="Print" @click="printAmendments"></cw-button>
+      <div class="flex flex-col gap-6 p-6">
+        <cw-callout
+          type="warning" size="md"
+          content="Item or Section changes may have reset previously entered amounts. Please review your bid carefully.">
+        </cw-callout>
+        <div v-for="(amendment, i) in amendments" :key="amendment.id"
+          class="flex flex-col gap-4 pb-6"
+          :class="i < amendments.length - 1 ? 'border-b border-specter-900' : ''">
+          <div class="flex flex-col gap-2">
+            <div class="flex gap-2 items-center">
+              <span class="text-sm font-semibold text-primary">{{ amendment.label }}</span>
+              <cw-tag v-if="amendment.isNew" content="New" size="sm" theme="amber"></cw-tag>
+            </div>
+            <p class="text-xs text-primary">{{ amendment.date }}: {{ amendment.note }}</p>
+          </div>
+          <div v-for="group in amendment.groups" :key="group.title" class="flex flex-col gap-2">
+            <p class="text-xs font-semibold text-primary">{{ group.title }}</p>
+            <div v-for="item in group.items" :key="item" class="flex gap-1 items-start">
+              <cw-icon-bullet size="sm" class="shrink-0"></cw-icon-bullet>
+              <p class="text-xs text-primary flex-1 min-w-0">{{ item }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </cw-slideout>
+
+    <!-- ═══ Amendments print target ════════════════════════════════════ -->
+    <div id="amendments-print-target">
+      <h1 class="text-xl font-bold mb-4">Amendments — Call 030</h1>
+      <div v-for="(amendment, i) in amendments" :key="'print-' + amendment.id"
+        class="mb-6 pb-6"
+        :class="i < amendments.length - 1 ? 'border-b border-specter-900' : ''">
+        <div class="flex gap-2 items-center mb-1">
+          <span class="text-sm font-semibold">{{ amendment.label }}</span>
+          <span v-if="amendment.isNew" class="text-xs font-semibold bg-amber-50 text-warning px-1.5 rounded">New</span>
+        </div>
+        <p class="text-xs mb-3">{{ amendment.date }}: {{ amendment.note }}</p>
+        <div v-for="group in amendment.groups" :key="'print-' + group.title" class="mb-2">
+          <p class="text-xs font-semibold mb-1">{{ group.title }}</p>
+          <ul class="pl-5 m-0">
+            <li v-for="item in group.items" :key="item" class="text-xs">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Mobile nav slideout ══════════════════════════════════════ -->
+    <cw-slideout id="mobile-nav-slideout" size="sm" no-padding clickaway placement="left">
+      <nav class="flex flex-col w-full">
+        <button v-for="page in navItems" :key="'mobile-' + page.id"
+          class="flex justify-between gap-x-1 px-4 py-2.5 w-full border-b border-specter-500 text-left transition-colors"
+          :class="activePage === page.id ? 'bg-specter-100' : 'bg-white hover:bg-specter-50'"
+          @click="setPage(page.id); closeMobileNav()">
+          <div class="flex items-center gap-2">
+            <div class="flex h-[20px] w-[20px] shrink-0 items-center justify-center text-secondary">
+              <cw-icon-bullet v-if="activePage === page.id" size="lg"></cw-icon-bullet>
+            </div>
+            <span class="text-sm font-medium text-primary leading-5">{{ page.label }}</span>
+          </div>
+          <cw-icon-warning v-if="checkResults && checkResults.byPage[page.id]?.length > 0"
+            size="sm" class="text-cinnabar-500 shrink-0 self-center">
+          </cw-icon-warning>
+        </button>
+      </nav>
+    </cw-slideout>
+
+    <!-- ═══ Body: sidebar + content in a flex row ═══════════════════ -->
+    <div class="flex flex-1 min-h-0 flex-col md:flex-row gap-x-6 bg-specter-300 print:block print:h-auto">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <div class="flex flex-col bg-specter-300 md:w-60 md:shrink-0 md:h-full md:overflow-y-auto print:hidden">
+
+      <!-- ── Proposal detail ─────────────────────────────────────── -->
+      <div class="flex flex-col gap-2 p-6">
+        <!-- Identifiers -->
+        <div class="flex flex-wrap gap-1 items-baseline w-full">
+          <p class="flex-1 min-w-[168px] text-base font-semibold text-primary leading-6">Call 030</p>
+          <p class="flex-1 min-w-[168px] text-sm font-medium text-primary leading-5">1173631</p>
+          <div class="flex flex-1 min-w-[168px] gap-2 items-baseline whitespace-nowrap">
+            <p class="text-sm font-medium text-primary leading-5 shrink-0">2 Amendments</p>
+            <button class="text-xs font-normal leading-4 text-link" @click="openAmendmentsSlideout()">View all</button>
+          </div>
+        </div>
+        <!-- Save status -->
+        <div class="relative">
+          <div id="save-status" class="flex gap-2 items-start cursor-default">
+            <cw-icon-cloud-done size="sm" class="text-secondary shrink-0"></cw-icon-cloud-done>
+            <p class="text-xs text-secondary leading-4">4/12/27 at 2:00 PM EDT</p>
+          </div>
+          <cw-tooltip for="save-status" content="Your work is auto-saved" allowed-placements="top"></cw-tooltip>
+        </div>
+      </div>
+
+      <!-- ── Desktop only: validation + nav ───────────────────────── -->
+      <div class="hidden md:block">
+
+      <!-- ── Validation results (shown after Check) ──────────────── -->
+      <div v-if="checkResults && totalErrors > 0"
+        class="flex w-full flex-col px-6 py-4 bg-cinnabar-500 text-cinnabar-50">
+        <div class="flex space-x-2 text-sm font-semibold">
+          <span class="mr-auto">{{ totalErrors }} {{ totalErrors === 1 ? 'error' : 'errors' }}</span>
+          <cw-button size="sm" appearance="outlined" theme="secondary" aria-label="Previous error" @click="goPrevError">
+            <cw-icon-chevron-left slot="icon" size="xs"></cw-icon-chevron-left>
+          </cw-button>
+          <cw-button size="sm" appearance="outlined" theme="secondary" aria-label="Next error" @click="goNextError">
+            <cw-icon-chevron-right slot="icon" size="xs"></cw-icon-chevron-right>
+          </cw-button>
+        </div>
+        <button class="self-start text-xs text-cinnabar-50" type="button" @click="openErrorsSlideout">View full list</button>
+      </div>
+
+      <div v-else-if="checkResults && totalErrors === 0"
+        class="flex items-center gap-1 px-6 py-4 w-full bg-emerald-50">
+        <p class="flex-1 text-sm font-semibold text-primary leading-5">No errors found</p>
+        <cw-button theme="secondary" appearance="outlined" size="sm" content="Dismiss"
+          @click="dismissCheck"></cw-button>
+      </div>
+
+      <!-- ── Nav items ───────────────────────────────────────────── -->
+      <nav class="flex flex-col w-full">
+        <button v-for="page in navItems" :key="page.id"
+          class="flex justify-between gap-x-1 px-4 py-2.5 w-full border-b border-specter-500 text-left transition-colors"
+          :class="activePage === page.id ? 'bg-specter-500' : 'bg-specter-300 hover:bg-specter-400'"
+          @click="setPage(page.id)">
+          <div class="flex items-center gap-2">
+            <div class="flex h-[20px] w-[20px] shrink-0 items-center justify-center text-secondary">
+              <cw-icon-bullet v-if="activePage === page.id" size="lg"></cw-icon-bullet>
+            </div>
+            <span class="text-sm font-medium text-primary leading-5">{{ page.label }}</span>
+          </div>
+          <cw-icon-warning v-if="checkResults?.byPage[page.id]?.length > 0"
+            size="sm" class="text-cinnabar-500 shrink-0 self-center">
+          </cw-icon-warning>
+          <cw-icon-check v-else-if="pageComplete[page.id]"
+            size="sm" class="text-emerald-600 shrink-0 self-center">
+          </cw-icon-check>
+        </button>
+      </nav>
+
+      </div><!-- end desktop-only -->
+
+    </div><!-- end sidebar -->
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <div class="bid-content-area">
+
+      <!-- ── General ──────────────────────────────────────────────── -->
+      <div v-show="activePage === 'general'" class="bid-section print:!block break-after-page">
+        <div class="portion-title">
+          <div class="portion-title-main">
+            <div class="portion-title-heading">General</div>
+          </div>
+          <div class="flex items-center gap-1 shrink-0 text-secondary">
+            <cw-icon-check-verified size="xs" class="shrink-0"></cw-icon-check-verified>
+            <span class="text-xs whitespace-nowrap">Authorized to submit bids</span>
+          </div>
+        </div>
+
+        <!-- Bidder -->
+        <div class="bidder-box">
+          <!-- Digital ID bar -->
+          <div class="digital-id-bar">
+            <cw-icon-check-verified size="sm" class="shrink-0"></cw-icon-check-verified>
+            <span class="flex-1 text-sm font-semibold leading-5 min-w-0">Jane Smith</span>
+            <cw-tag size="sm" theme="emerald" content="Installed"></cw-tag>
+          </div>
+          <!-- Bidder info -->
+          <div class="bidder-info">
+            <div class="flex flex-col gap-1 flex-1 min-w-[208px]">
+              <div class="text-base font-bold text-primary">
+                {{ selectedBidder ? bidderOptions.find(b => b.value === selectedBidder)?.content : 'Unknown bidder' }}
+              </div>
+              <div class="text-xs text-secondary">
+                {{ selectedBidder ? bidderOptions.find(b => b.value === selectedBidder)?.address : 'Please select a bidder to set company information' }}
+              </div>
+            </div>
+            <div data-error-anchor class="flex-1 min-w-[208px]">
+              <cw-field-group class="m-0">
+                <label slot="label" for="bidder-field">Bidder</label>
+                <cw-select
+                  id="bidder-field"
+                  :value.prop="selectedBidder"
+                  @change="selectedBidder = $event.target.value"
+                  placeholder="Select"
+                  size="md"
+                  filterable
+                  :required.prop="true"
+                  :options.prop="bidderOptions">
+                </cw-select>
+                <cw-field-errors slot="errors" for="bidder-field" size="md"></cw-field-errors>
+              </cw-field-group>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proposal details -->
+        <div class="text-sm font-semibold text-primary mb-2">Proposal details:</div>
+        <div class="proposal-details">
+          <div class="proposal-detail-set">
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">Call</span>
+              <span class="proposal-detail-value">030</span>
+            </div>
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">Contract ID</span>
+              <span class="proposal-detail-value">1173631</span>
+            </div>
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">Project ID</span>
+              <span class="proposal-detail-value">P041747</span>
+            </div>
+          </div>
+          <div class="proposal-detail-set">
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">DBE</span>
+              <span class="proposal-detail-value">{{ (vendorGoals.find(g => g.label === 'DBE')?.req ?? 0).toFixed(2) }}%</span>
+            </div>
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">Location</span>
+              <span class="proposal-detail-value">Cherokee</span>
+            </div>
+            <div class="proposal-detail-row">
+              <span class="proposal-detail-label">Highway</span>
+              <span class="proposal-detail-value">286</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="proposal-description">
+          Bridge Repair S-11-286 (Indian Springs Rd) over Kings Creek
+        </div>
+
+        <!-- Automatic bid withdrawal -->
+        <div class="auto-withdrawal">
+          <div class="h-px bg-specter-500"></div>
+          <p class="text-sm font-semibold text-primary text-center">AUTOMATIC BID WITHDRAWAL</p>
+          <p class="text-sm text-primary -mt-4">Option to withdraw a bid submission for this Proposal, if the Bidder is already the apparent low bidder of a previously-opened bid for a Proposal with an earlier Call in this Letting.</p>
+          <div class="rounded p-4 bg-specter-400">
+            <div data-error-anchor>
+              <cw-field-group class="m-0">
+                <label slot="label" for="auto-withdraw-radio">Enable automatic bid withdrawal?</label>
+                <cw-radio-group id="auto-withdraw-radio" layout="inline" size="md"
+                  :value="autoWithdraw"
+                  @change="autoWithdraw = $event.target.value"
+                  :required.prop="true">
+                  <cw-radio-button value="yes" size="md" content="Yes"></cw-radio-button>
+                  <cw-radio-button value="no" size="md" content="No"></cw-radio-button>
+                </cw-radio-group>
+                <cw-field-errors v-show="checkAttempted" slot="errors" for="auto-withdraw-radio" size="md"></cw-field-errors>
+              </cw-field-group>
+            </div>
+            <div v-show="autoWithdraw === 'yes'" class="mt-4">
+              <cw-field-group class="m-0">
+                <label slot="label" for="withdraw-calls-group">Withdraw my bid for this proposal if I am the apparent low bidder for:</label>
+                <cw-checkbox-group id="withdraw-calls-group" size="md"
+                  :value="withdrawCallsMap"
+                  :required.prop="true"
+                  @change="withdrawCallsMap = $event.target.value">
+                  <cw-checkbox value="call010" content="Call 010" caption="P041745" size="md" layout="inline"></cw-checkbox>
+                  <cw-checkbox value="call020" content="Call 020" caption="P041746" size="md" layout="inline"></cw-checkbox>
+                </cw-checkbox-group>
+                <cw-field-errors slot="errors" v-show="checkAttempted" for="withdraw-calls-group" size="md"></cw-field-errors>
+              </cw-field-group>
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional slot -->
+        <div class="flex items-center justify-center mt-4 rounded min-h-[120px] bg-pink-100 border border-dashed border-pink-500">
+          <span class="text-xs text-pink-600">Slot</span>
+        </div>
+      </div>
+
+      <!-- ── Schedule of items ─────────────────────────────────────── -->
+      <div v-show="activePage === 'schedule'" class="bid-section print:!block break-after-page">
+        <div class="portion-title">
+          <div class="portion-title-main">
+            <div class="portion-title-heading">Schedule of items</div>
+            <div class="portion-title-subhead">Use the Tools menu to import or export the item list</div>
+          </div>
+          <div class="portion-title-corner">Item total: ${{ formatAmt(itemTotal) }}</div>
+        </div>
+        <div class="text-sm text-secondary mb-3">{{ scheduleSections.flatMap(s => s.items).length }} Items</div>
+
+        <div class="flex flex-col gap-4">
+        <cw-bidx-proposal-item-section
+          v-for="section in scheduleSections"
+          :key="section.id"
+          :section-id="section.id"
+          :section-number="section.number"
+          :description="section.description"
+          :total.prop="sectionTotal(section)">
+          <cw-bidx-proposal-item v-for="item in section.items" :key="item.line"
+            :id="'schedule-item-' + item.line"
+            :status="isLineOvercommitted(item.line) && !overcommitMap[item.line] ? 'warning' : 'default'">
+            <div class="flex w-full flex-col gap-3">
+              <!-- Item row -->
+              <div class="flex flex-wrap items-center gap-4">
+                <div class="flex shrink grow-full basis-44 flex-col gap-1">
+                  <div class="flex gap-4 font-medium">
+                    <div>Line {{ item.line }}</div>
+                    <div>{{ item.code }}</div>
+                  </div>
+                  <div class="font-medium">{{ item.description }}</div>
+                </div>
+                <!-- Overcommit warning icon -->
+                <template v-if="isLineOvercommitted(item.line) && !overcommitMap[item.line]">
+                  <cw-icon-warning :id="'sched-warn-' + item.line" size="sm" class="text-warning"></cw-icon-warning>
+                  <cw-tooltip :for="'sched-warn-' + item.line" content="Overcommitted" allowed-placements="top" offset="8" strategy="fixed"></cw-tooltip>
+                </template>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 ml-auto">
+                  <div class="whitespace-nowrap text-secondary">{{ item.qty }} {{ item.unit }}</div>
+                  <div data-error-anchor class="w-[8.5rem]">
+                    <cw-input :id="'price-' + item.line" type="currency" placeholder="Unit price" size="sm" width="fill" min-fraction-digits="2" max-fraction-digits="2" trailing-zero-display="auto" :value.prop="item.unitPrice" @change="item.unitPrice = $event.target.value"></cw-input>
+                    <cw-field-errors :for="'price-' + item.line" size="sm"></cw-field-errors>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-xs px-2 min-w-[136px] justify-end">
+                    <span class="text-secondary">$</span>
+                    <span class="font-medium text-primary">{{ formatAmt(itemExtension(item)) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Assignee box: shown when any vendor has this line assigned -->
+              <div v-if="assigneesForLine(item.line).length" class="rounded border border-specter-200 bg-white p-4">
+                <!-- Header -->
+                <div class="mb-3 flex flex-wrap justify-between gap-x-4 gap-y-2">
+                  <div class="text-sm font-semibold text-primary">Item assigned to:</div>
+                  <cw-checkbox
+                    :id="'overcommit-' + item.line"
+                    size="sm"
+                    layout="inline-right"
+                    content="Allow overcommitment"
+                    :checked.prop="overcommitMap[item.line] || false"
+                    @change="overcommitMap[item.line] = $event.target.checked">
+                  </cw-checkbox>
+                </div>
+                <!-- Vendor rows -->
+                <ul class="flex flex-col gap-1">
+                  <li v-for="{vendor: v, assignedItem: ai} in assigneesForLine(item.line)" :key="v.id"
+                    class="flex flex-wrap items-center gap-x-6 gap-y-1 py-1.5 text-xs">
+                    <button type="button"
+                      class="grow text-left text-link font-medium hover:underline max-w-xs"
+                      @click="goToVendor(v)">
+                      {{ v.company }}
+                    </button>
+                    <div class="flex items-center gap-2 min-w-[8rem]">
+                      <cw-tag v-if="v.classification"
+                        :content="classificationOptions.find(o => o.value === v.classification)?.content ?? v.classification"
+                        size="sm" theme="specter">
+                      </cw-tag>
+                    </div>
+                    <div class="flex items-center gap-1.5 min-w-[6rem] justify-end font-medium ml-auto">
+                      <span class="font-normal text-secondary">$</span>
+                      {{ ai.itemQuote ? formatAmt(parseAmount(ai.itemQuote)) : '—' }}
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </cw-bidx-proposal-item>
+        </cw-bidx-proposal-item-section>
+        </div>
+      </div>
+
+      <!-- ── Sites ─────────────────────────────────────────────────── -->
+      <div v-show="activePage === 'sites'" class="bid-section print:!block break-after-page">
+        <div class="portion-title">
+          <div class="portion-title-main">
+            <div class="portion-title-heading">Sites</div>
+          </div>
+          <div class="portion-title-corner">Site total: ${{ formatAmt(siteTotal) }}</div>
+        </div>
+        <div class="text-xs text-secondary mb-3">{{ siteItems.length }} Sites</div>
+
+        <div class="bg-white border border-specter-500 rounded overflow-hidden">
+          <div v-for="site in siteItems" :key="site.id"
+            class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 border-b border-specter-500 last:border-b-0">
+            <!-- Details -->
+            <div class="flex flex-1 flex-col gap-1 min-w-[168px]">
+              <div class="flex flex-wrap gap-x-4 gap-y-1 items-center">
+                <div class="flex gap-4 items-center text-xs font-medium text-primary whitespace-nowrap">
+                  <span>Site {{ site.number }}</span>
+                  <span>{{ site.type }}</span>
+                </div>
+                <div v-if="site.min || site.max" class="flex flex-wrap gap-x-4 gap-y-1 items-center">
+                  <div v-if="site.min" class="flex gap-1 items-center">
+                    <cw-tag content="MIN" size="sm" theme="midnight"></cw-tag>
+                    <span class="text-xs text-secondary whitespace-nowrap">= {{ site.min }} days</span>
+                  </div>
+                  <div v-if="site.max" class="flex gap-1 items-center">
+                    <cw-tag content="MAX" size="sm" theme="midnight"></cw-tag>
+                    <span class="text-xs text-secondary whitespace-nowrap">= {{ site.max }} days</span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-primary">{{ site.description }}</p>
+            </div>
+            <!-- Amounts -->
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 justify-end shrink-0">
+              <div class="flex items-center gap-1.5 text-xs px-2 min-w-[136px]">
+                <span class="text-secondary">$</span>
+                <span class="flex-1 text-right text-primary">{{ site.costPerDay.toFixed(2) }}</span>
+                <span class="text-secondary whitespace-nowrap">/ day</span>
+              </div>
+              <div data-error-anchor class="w-[8.5rem]">
+                <cw-input :id="'days-' + site.id" size="sm" placeholder=" " width="fill" :value.prop="site.days" @change="onDaysChange(site, $event.target.value)">
+                  <span slot="add-on-right">days</span>
+                </cw-input>
+                <cw-field-errors :for="'days-' + site.id" size="sm"></cw-field-errors>
+              </div>
+              <div class="flex items-center gap-1.5 text-xs px-2 min-w-[136px] justify-end">
+                <span class="text-secondary">$</span>
+                <span class="font-medium text-primary">{{ formatAmt(parseAmount(site.days) * site.costPerDay) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Vendor list ────────────────────────────────────────────── -->
+      <div v-show="activePage === 'vendors'" class="bid-section print:!block break-after-page">
+        <div class="portion-title">
+          <div class="portion-title-main">
+            <div class="portion-title-heading">Vendor list</div>
+            <div class="portion-title-subhead">Include every vendor quote received. Only selected vendors will be used.</div>
+          </div>
+          <div class="portion-title-corner">Selected: ${{ formatAmt(selectedVendorTotal) }}</div>
+        </div>
+
+        <!-- Goal charts -->
+        <!-- TODO: hide/remove this entire container when vendorGoals.length === 0 (no goals on the proposal) -->
+        <div class="border border-specter-500 rounded p-4 flex flex-wrap justify-center mb-6">
+          <div v-for="goal in vendorGoals" :key="goal.label"
+            class="flex flex-1 flex-col gap-1 items-center justify-center min-w-[248px]">
+            <button type="button"
+              :id="`goal-${goal.label.toLowerCase()}`"
+              class="group flex flex-col gap-1 items-center justify-center w-full rounded focus:outline-none">
+              <!-- Chart container -->
+              <div class="flex gap-3 items-center justify-center px-3 py-2 rounded transition-colors group-hover:bg-specter-200"
+                :class="goalProgress(goal) === 'invalid' ? 'border-2 border-cinnabar-500' : ''">
+                <!-- Radial ring -->
+                <div class="relative shrink-0 overflow-clip" style="width:64px;height:64px;">
+                  <cw-progress type="radial" appearance="duochromatic"
+                    :value.prop="goalProgressValue(goal)"
+                    :max.prop="1"
+                    :theme="goalProgress(goal) === 'complete' ? 'emerald' : goalProgress(goal) === 'invalid' ? 'cinnabar' : 'azul'"
+                    :content="goal.label"
+                    style="width:64px;height:64px;display:block;">
+                  </cw-progress>
+                </div>
+                <!-- Detail -->
+                <div class="flex flex-col gap-1 shrink-0">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-semibold text-secondary">${{ goalActualAmt(goal) }}</span>
+                    <cw-icon-check v-if="goalProgress(goal) === 'complete'" class="text-emerald-600 shrink-0" size="sm"></cw-icon-check>
+                  </div>
+                  <div class="flex gap-1 text-xs text-secondary whitespace-nowrap">
+                    <span>Goal:</span><span>${{ goalTargetAmt(goal) }}</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Invalid error text -->
+              <div v-if="goalProgress(goal) === 'invalid'" class="flex gap-1 items-center">
+                <cw-icon-warning-outline size="xs" class="shrink-0 text-cinnabar-700"></cw-icon-warning-outline>
+                <span class="text-xs whitespace-nowrap text-cinnabar-700">Required {{ goal.label }} goal not met</span>
+              </div>
+            </button>
+            <cw-tooltip
+              :for="`goal-${goal.label.toLowerCase()}`"
+              :content="`Goal = ${goal.req.toFixed(2)}% of item total`"
+              allowed-placements="top"
+              theme="midnight">
+            </cw-tooltip>
+          </div>
+        </div>
+
+        <!-- Sort & filter -->
+        <div class="mb-4 flex items-center gap-4 text-xs text-secondary print:hidden">
+          <span class="whitespace-nowrap">
+            <template v-if="filteredVendors.length !== vendors.length">{{ filteredVendors.length }} of {{ vendors.length }} Vendors</template>
+            <template v-else>{{ vendors.length }} Vendor{{ vendors.length === 1 ? '' : 's' }}</template>
+          </span>
+          <button type="button" class="flex shrink-0 items-center gap-1 text-xs font-medium text-secondary"
+            @click="vendorSort = vendorSort === 'asc' ? 'desc' : 'asc'">
+            <cw-icon-sort-desc v-if="vendorSort === 'asc'" size="sm"></cw-icon-sort-desc>
+            <cw-icon-sort-asc v-else size="sm"></cw-icon-sort-asc>
+            <div><span class="sr-only">Sort </span>{{ vendorSort === 'asc' ? 'A-Z' : 'Z-A' }}</div>
+          </button>
+          <div class="flex shrink-0 items-baseline gap-1">
+            <label for="cert-filter-select">Show:</label>
+            <cw-select id="cert-filter-select"
+              appearance="ghost"
+              size="sm"
+              strategy="fixed"
+              width="fill"
+              :value.prop="certFilter"
+              @change="certFilter = $event.target.value">
+              <cw-select-group>
+                <cw-select-option content="Any certification" value="any" size="sm"></cw-select-option>
+              </cw-select-group>
+              <cw-select-option
+                v-for="ct in availableCertTypes"
+                :key="ct.cert"
+                :content="ct.cert"
+                :value="ct.cert"
+                :caption="`${ct.count} vendor${ct.count === 1 ? '' : 's'}`"
+                size="sm">
+              </cw-select-option>
+            </cw-select>
+          </div>
+          <cw-toggle class="ml-auto" content="Hide unused" size="sm" layout="right"
+            :checked.prop="hideUnused"
+            @change="hideUnused = $event.target.checked">
+          </cw-toggle>
+        </div>
+
+        <!-- Vendor cards -->
+        <div v-if="vendors.length" class="flex flex-col gap-3 mb-3">
+          <div v-for="vendor in filteredVendors" :key="vendor.id"
+            :id="'vendor-card-' + vendor.id"
+            class="border rounded flex flex-col gap-y-2 p-3 transition-colors"
+            :class="vendor.selected
+              ? (vendor.expanded ? 'bg-azul-25 border-azul-300' : 'bg-azul-50 border-transparent')
+              : (vendor.expanded ? 'bg-disabled-light border-disabled-dark' : 'bg-disabled-light border-transparent')">
+
+            <!-- Header row -->
+            <div class="relative flex gap-2 items-start">
+
+              <!-- Invisible full-area expand button (sits behind content) -->
+              <button type="button" class="absolute inset-0 cursor-pointer rounded"
+                @click="vendor.expanded = !vendor.expanded">
+              </button>
+
+              <!-- Selection checkbox (z-above the button, intercepts its own clicks) -->
+              <div class="relative z-10 shrink-0 flex items-center" @click.stop>
+                <cw-checkbox
+                  size="md"
+                  layout="inline"
+                  :checked.prop="vendor.selected"
+                  @change="vendor.selected = $event.target.checked">
+                </cw-checkbox>
+              </div>
+
+              <!-- Name + indicators + controls (pointer-events-none — clicks fall through to expand button) -->
+              <!-- Outer row: no-wrap so amount+chevron are always pinned top-right -->
+              <div class="pointer-events-none flex-1 min-w-0 flex items-start gap-x-2">
+
+                <!-- Company section: flex-wrap so name+indicators can wrap at narrow widths -->
+                <div class="flex-1 min-w-0 flex flex-wrap items-start gap-x-2 gap-y-1">
+
+                  <!-- Company name: fills available space, truncates when collapsed -->
+                  <span class="text-sm font-semibold flex-1 min-w-[120px]"
+                    :class="[vendor.selected ? 'text-primary' : 'text-disabled-dark', vendor.expanded ? 'break-words' : 'truncate']">{{ vendor.company }}</span>
+
+                  <!-- Indicators: shrink-0, wrap below name at narrow widths -->
+                  <div v-if="vendor.classification || vendor.certTypes.length || vendor.assignedItems.length || vendor.attachments?.length"
+                    class="flex items-center gap-x-2 shrink-0 py-[2px]">
+                    <cw-tag v-if="vendor.classification"
+                      :content="classificationOptions.find(o => o.value === vendor.classification)?.content ?? vendor.classification"
+                      size="sm" theme="specter">
+                    </cw-tag>
+                    <cw-icon-items v-if="vendor.assignedItems.length"
+                      :id="`vendor-${vendor.id}-items-icon`"
+                      aria-label="Items assigned"
+                      size="sm" class="pointer-events-auto text-secondary" tabindex="0">
+                    </cw-icon-items>
+                    <cw-tooltip v-if="vendor.assignedItems.length"
+                      :for="`vendor-${vendor.id}-items-icon`"
+                      content="Items assigned" allowed-placements="top" theme="midnight">
+                    </cw-tooltip>
+                    <cw-icon-attachment v-if="vendor.attachments?.length"
+                      :id="`vendor-${vendor.id}-attach-icon`"
+                      aria-label="File attached"
+                      size="sm" class="pointer-events-auto text-secondary" tabindex="0">
+                    </cw-icon-attachment>
+                    <cw-tooltip v-if="vendor.attachments?.length"
+                      :for="`vendor-${vendor.id}-attach-icon`"
+                      content="File attached" allowed-placements="top" theme="midnight">
+                    </cw-tooltip>
+                    <cw-tag v-for="ct in vendor.certTypes" :key="ct" :content="ct" size="sm" theme="specter"></cw-tag>
+                  </div>
+
+                </div>
+
+                <!-- Amount + chevron: shrink-0 sibling, always pinned top-right regardless of name wrapping -->
+                <div class="flex items-center gap-x-2 shrink-0">
+                  <span class="text-sm font-medium w-[136px] shrink-0 text-right tabular-nums"
+                    :class="vendor.selected ? 'text-primary' : 'text-disabled-dark'">
+                    ${{ formatAmt(vendorItemsTotal(vendor)) }}
+                  </span>
+                  <cw-icon-chevron-up v-if="vendor.expanded" size="md" class="text-secondary"></cw-icon-chevron-up>
+                  <cw-icon-chevron-down v-else size="md" class="text-secondary"></cw-icon-chevron-down>
+                </div>
+
+              </div>
+
+            </div><!-- /header row -->
+
+            <!-- Expanded body -->
+            <div v-show="vendor.expanded" class="flex flex-col gap-y-2">
+
+              <!-- Address -->
+              <p v-if="vendor.address" class="px-2 text-xs text-primary">{{ vendor.address }}</p>
+
+              <!-- Action row: Manage | cert ID | Use toward goal -->
+              <div class="flex flex-wrap gap-x-3 gap-y-1 items-center">
+                <cw-button size="sm" appearance="ghost" theme="primary" content="Manage"
+                  :id="`manage-trigger-${vendor.id}`">
+                  <cw-icon-caret-down slot="icon-right" size="sm"></cw-icon-caret-down>
+                </cw-button>
+                <cw-dropdown-menu :for="`manage-trigger-${vendor.id}`" strategy="fixed">
+                  <cw-dropdown-menu-group>
+                    <cw-dropdown-menu-item content="Change vendor" @click="openChangeVendorModal(vendor)"></cw-dropdown-menu-item>
+                  </cw-dropdown-menu-group>
+                  <cw-dropdown-menu-group>
+                    <cw-dropdown-menu-item content="Remove vendor" theme="destructive" @click="openRemoveVendorModal(vendor)"></cw-dropdown-menu-item>
+                  </cw-dropdown-menu-group>
+                </cw-dropdown-menu>
+                <span v-if="vendor.certCode" class="text-xs text-primary">{{ vendor.certCode }}</span>
+                <cw-checkbox v-if="vendorEligibleGoals(vendor).length"
+                  content="Use toward goal"
+                  size="sm"
+                  layout="inline"
+                  :checked.prop="vendor.useTowardGoal"
+                  @change="vendor.useTowardGoal = $event.target.checked">
+                </cw-checkbox>
+                <!-- Goal attribution — only shown when cert qualifies for multiple *configured* goals -->
+                <cw-radio-group v-if="vendor.useTowardGoal && vendorEligibleGoals(vendor).length > 1"
+                  layout="inline"
+                  size="sm"
+                  :value="vendor.goalAttribution"
+                  @change="vendor.goalAttribution = $event.target.value">
+                  <cw-radio-button v-for="ct in vendorEligibleGoals(vendor)" :key="ct"
+                    :value="ct" :content="ct" size="sm">
+                  </cw-radio-button>
+                </cw-radio-group>
+              </div>
+
+              <!-- Form fields -->
+              <div class="flex flex-wrap gap-3 items-start p-2">
+                <!-- Quote — only in single-quote mode (canAssignItems off) -->
+                <cw-field-group v-if="!canAssignItems" size="sm" class="flex-1 min-w-[168px] max-w-[320px]">
+                  <label slot="label" :for="`vendor-${vendor.id}-quote`">Quote</label>
+                  <cw-input type="currency" size="sm" placeholder="0.00" width="fill" text-align="left"
+                    min-fraction-digits="2" max-fraction-digits="2" trailing-zero-display="auto"
+                    :id="`vendor-${vendor.id}-quote`"
+                    :required.prop="true"
+                    :value.prop="vendor.quote"
+                    @change="vendor.quote = $event.target.value">
+                    <span slot="add-on-left" class="whitespace-nowrap">$</span>
+                  </cw-input>
+                  <cw-field-errors slot="errors" :for="`vendor-${vendor.id}-quote`" size="sm"></cw-field-errors>
+                </cw-field-group>
+                <!-- Classification -->
+                <cw-field-group size="sm" class="flex-1 min-w-[168px] max-w-[320px]">
+                  <label slot="label" :for="`vendor-${vendor.id}-class`">Classification</label>
+                  <cw-select size="sm" placeholder="Select" width="fill"
+                    :id="`vendor-${vendor.id}-class`"
+                    :required.prop="true"
+                    :options.prop="classificationOptions"
+                    :value.prop="vendor.classification"
+                    @change="vendor.classification = $event.target.value">
+                  </cw-select>
+                  <cw-field-errors slot="errors" :for="`vendor-${vendor.id}-class`" size="sm"></cw-field-errors>
+                </cw-field-group>
+                <!-- Work type -->
+                <cw-field-group size="sm" class="flex-1 min-w-[168px] max-w-[320px]">
+                  <label slot="label" :for="`vendor-${vendor.id}-worktype`">Work type</label>
+                  <cw-select size="sm" placeholder="Select" width="fill"
+                    :id="`vendor-${vendor.id}-worktype`"
+                    :required.prop="true"
+                    :options.prop="workTypeOptions"
+                    :value.prop="vendor.workType"
+                    @change="vendor.workType = $event.target.value">
+                  </cw-select>
+                  <cw-field-errors slot="errors" :for="`vendor-${vendor.id}-worktype`" size="sm"></cw-field-errors>
+                </cw-field-group>
+              </div>
+
+              <!-- Items section — only shown when canAssignItems is on -->
+              <div v-if="canAssignItems" class="flex flex-col gap-y-3 mx-2 pt-4 pb-2 border-t border-azul-100">
+                <div class="flex gap-3 items-center">
+                  <div class="flex gap-1.5 items-center">
+                    <span class="text-xs font-semibold text-primary">Items</span>
+                    <cw-badge :content="String(vendor.assignedItems.length)" theme="white"></cw-badge>
+                  </div>
+                  <cw-button size="sm" appearance="ghost" theme="primary" content="Assign"
+                    @click.stop="openAssignItems(vendor)">
+                    <cw-icon-add slot="icon-left"></cw-icon-add>
+                  </cw-button>
+                </div>
+
+                <!-- Assigned items list -->
+                <div v-if="vendor.assignedItems.length"
+                  class="border border-specter-500 rounded overflow-hidden">
+                  <div v-for="ai in vendor.assignedItems" :key="ai.line"
+                    :class="['flex gap-2 items-start border-b border-specter-500 last:border-b-0 px-4 py-3',
+                      isLineOvercommitted(ai.line) && !overcommitMap[ai.line] ? 'bg-amber-50' : 'bg-specter-50']">
+
+                    <!-- Item content + quote -->
+                    <div class="flex-1 min-w-0 flex flex-col gap-2">
+                      <div class="flex flex-wrap gap-x-4 gap-y-2 items-center">
+                        <!-- Item identifiers + description -->
+                        <div class="flex-1 min-w-[168px] flex flex-col gap-1 text-xs font-medium">
+                          <div class="flex flex-wrap gap-x-4 items-center whitespace-nowrap">
+                            <button type="button" class="text-link font-semibold min-w-[60px] text-left hover:underline" @click="goToScheduleItem(ai.line)">Line {{ ai.line }}</button>
+                            <span class="text-primary">{{ ai.code }}</span>
+                          </div>
+                          <span class="text-primary">{{ ai.description }}</span>
+                        </div>
+                        <!-- Overcommit / multi-vendor icons -->
+                        <div class="flex items-center gap-4 shrink-0">
+                          <template v-if="isLineOvercommitted(ai.line) && !overcommitMap[ai.line]">
+                            <cw-icon-warning :id="`vendor-warn-${vendor.id}-${ai.line}`" size="sm" class="text-warning"></cw-icon-warning>
+                            <cw-tooltip :for="`vendor-warn-${vendor.id}-${ai.line}`" content="Overcommitted" allowed-placements="top" offset="8" strategy="fixed"></cw-tooltip>
+                          </template>
+                          <template v-if="assigneesForLine(ai.line).length > 1">
+                            <cw-icon-group :id="`vendor-group-${vendor.id}-${ai.line}`" size="sm"></cw-icon-group>
+                            <cw-tooltip :for="`vendor-group-${vendor.id}-${ai.line}`" content="Multiple vendors" allowed-placements="top" offset="8" strategy="fixed"></cw-tooltip>
+                          </template>
+                        </div>
+                        <!-- Per-item quote input -->
+                        <div class="shrink-0 w-[136px]">
+                          <cw-field-group size="sm" width="fill">
+                            <cw-input type="currency" size="sm" placeholder="Quote" width="fill" :required.prop="true"
+                              min-fraction-digits="2" max-fraction-digits="2" trailing-zero-display="auto"
+                              :id="`item-quote-${vendor.id}-${ai.line}`"
+                              :value.prop="ai.itemQuote"
+                              @change="ai.itemQuote = $event.target.value">
+                              <span slot="add-on-left" class="whitespace-nowrap">$</span>
+                            </cw-input>
+                            <cw-field-errors slot="errors" :for="`item-quote-${vendor.id}-${ai.line}`" size="sm"></cw-field-errors>
+                          </cw-field-group>
+                        </div>
+                      </div>
+                      <!-- Note textarea -->
+                      <cw-textarea v-if="ai.showNote" size="sm" rows="2" placeholder="Note" width="fill"
+                        :value.prop="ai.note"
+                        @change="ai.note = $event.target.value">
+                      </cw-textarea>
+                    </div>
+
+                    <!-- Manage item button + dropdown -->
+                    <div class="shrink-0">
+                      <cw-button size="md" theme="secondary" appearance="ghost"
+                        :id="`item-manage-${vendor.id}-${ai.line}`">
+                        <cw-icon-more-vert slot="icon"></cw-icon-more-vert>
+                      </cw-button>
+                      <cw-dropdown-menu :for="`item-manage-${vendor.id}-${ai.line}`" strategy="fixed">
+                        <cw-dropdown-menu-group>
+                          <cw-dropdown-menu-item
+                            :content="ai.showNote ? 'Remove note' : 'Show note'"
+                            :theme="ai.showNote ? 'destructive' : 'action'"
+                            @click="toggleItemNote(ai)">
+                          </cw-dropdown-menu-item>
+                        </cw-dropdown-menu-group>
+                        <cw-dropdown-menu-group>
+                          <cw-dropdown-menu-item content="Remove item" theme="destructive"
+                            @click="removeAssignedItem(vendor, ai.line)">
+                          </cw-dropdown-menu-item>
+                        </cw-dropdown-menu-group>
+                      </cw-dropdown-menu>
+                    </div>
+
+                  </div><!-- /assigned item row -->
+                </div><!-- /assigned items list -->
+
+              </div><!-- /items section -->
+
+            </div><!-- /expanded body -->
+          </div>
+        </div>
+
+        <!-- Add vendor button -->
+        <div class="flex justify-center py-4">
+          <cw-button theme="primary" appearance="outlined" size="md" content="Add vendor" @click="openAddVendorModal">
+            <cw-icon-add slot="icon-left"></cw-icon-add>
+          </cw-button>
+        </div>
+
+        <!-- Disclaimer -->
+        <p class="text-xs text-secondary text-center mb-6">
+          Quote amounts are automatically calculated for Distributors (at 40%) and Suppliers (at 60%)
+        </p>
+
+        <!-- Certification block -->
+        <div class="flex flex-col gap-6">
+          <p class="text-sm text-primary">The Vendor list must include all vendors who provided a quote to the bidder, whether used or unused, for both DBEs and non-DBEs. All applicable NAICS codes for each vendor should also be included. If a certified DBE is added to this bid as a Supplier or Distributor, a DBE Regular Dealer-Distributor Affirmation form must be completed and attached.</p>
+          <div class="rounded bg-specter-400 p-4" data-error-anchor>
+            <cw-field-group class="m-0">
+              <cw-checkbox
+                id="vendor-cert-checkbox"
+                content="I certify that, to the best of my knowledge, any and all subcontractor quotes are accurately represented."
+                size="md"
+                layout="vertical"
+                :required.prop="true"
+                :checked.prop="vendorCertified"
+                @change="vendorCertified = $event.target.checked">
+              </cw-checkbox>
+              <cw-field-errors slot="errors" for="vendor-cert-checkbox" size="md"></cw-field-errors>
+            </cw-field-group>
+          </div>
+        </div>
+
+        <!-- Optional slot -->
+        <div class="flex items-center justify-center mt-4 rounded min-h-[120px] bg-pink-100 border border-dashed border-pink-500">
+          <span class="text-xs text-pink-600">Slot</span>
+        </div>
+      </div>
+
+
+      <!-- ── Bid bond ───────────────────────────────────────────────── -->
+      <div v-show="activePage === 'bidbond'" class="bid-section print:!block break-after-page">
+        <div class="portion-title">
+          <div class="portion-title-main">
+            <div class="portion-title-heading">Bid bond</div>
+            <div class="portion-title-subhead">Goal: {{ bondGoalPct.toFixed(2) }}% of item total (${{ formatAmt(itemTotal * bondGoalPct / 100) }})</div>
+          </div>
+        </div>
+
+        <!-- Bidder info -->
+        <div class="flex flex-col gap-1 mb-6">
+          <template v-if="selectedBidder">
+            <p class="text-base font-bold text-primary">{{ bidderOptions.find(b => b.value === selectedBidder)?.content }}</p>
+            <p class="text-xs text-secondary">{{ bidderOptions.find(b => b.value === selectedBidder)?.address }}</p>
+          </template>
+          <template v-else>
+            <p class="text-base font-bold text-primary">Unknown bidder</p>
+            <p class="text-xs text-primary">Bidder must be set on the <button class="text-link font-medium" @click="setPage('general'); nextTick(() => document.getElementById('bidder-field')?.focus())">General</button> portion</p>
+          </template>
+        </div>
+
+        <!-- Form box -->
+        <div class="rounded p-4 flex flex-col gap-3 bg-specter-400">
+          <!-- Inputs row -->
+          <div class="flex flex-wrap gap-x-4 gap-y-3 items-start">
+            <!-- Bond type -->
+            <div data-error-anchor class="flex-1 min-w-[200px] max-w-[320px]">
+              <cw-field-group class="m-0">
+                <label slot="label" for="bond-type-select">Bond type</label>
+                <cw-select id="bond-type-select" :value.prop="bondType" @change="bondType = $event.target.value" placeholder="Select" size="md" :required.prop="true" :readonly.prop="bondVerified" :options.prop="bondTypeOptions"></cw-select>
+                <cw-field-errors slot="errors" for="bond-type-select" size="md"></cw-field-errors>
+              </cw-field-group>
+            </div>
+
+            <!-- Electronic: Registry + Bond ID + Verify/Reset -->
+            <cw-field-group v-show="bondType === 'electronic'" class="shrink-0 m-0">
+                <label slot="label" for="bond-registry-radio">Registry</label>
+                <cw-radio-group id="bond-registry-radio" layout="inline" size="md"
+                  :value="bondRegistry"
+                  @change="bondRegistry = $event.target.value"
+                  :required.prop="true"
+                  :readonly.prop="bondVerified">
+                  <cw-radio-button value="surety2000" size="md" content="Surety2000"></cw-radio-button>
+                  <cw-radio-button value="tinubu" size="md" content="Tinubu"></cw-radio-button>
+                </cw-radio-group>
+                <cw-field-errors v-show="checkAttempted || verifyAttempted" for="bond-registry-radio" size="md"></cw-field-errors>
+              </cw-field-group>
+              <div v-show="bondType === 'electronic'" class="flex gap-2 items-start">
+                <cw-field-group class="flex-1 min-w-[120px] max-w-[200px] m-0">
+                  <label slot="label" for="bond-id-input">Bond ID</label>
+                  <cw-input id="bond-id-input" v-model="bondId" size="md" :required.prop="true" :readonly.prop="bondVerified"></cw-input>
+                  <cw-field-errors v-show="verifyAttempted" for="bond-id-input" size="md"></cw-field-errors>
+                </cw-field-group>
+                <div class="pt-6 shrink-0">
+                  <cw-button v-if="!bondVerified" theme="primary" size="md" content="Verify" @click="verifyBond"></cw-button>
+                  <cw-button v-else theme="destructive" appearance="ghost" size="md" content="Reset" @click="resetBond"></cw-button>
+                </div>
+              </div>
+          </div>
+
+          <!-- Electronic: info notice (shown after verification) -->
+          <cw-callout v-if="bondType === 'electronic' && bondVerified"
+            type="info" size="md"
+            content="Changing the Bidder after verification will reset this form.">
+          </cw-callout>
+
+          <!-- Bond verification details (inside form box, after callout) -->
+          <div v-if="bondType === 'electronic' && bondVerified">
+            <div class="text-sm font-semibold text-primary mb-2">Bond verification details:</div>
+            <div class="proposal-details !mb-0">
+              <!-- Column A -->
+              <div class="proposal-detail-set">
+                <div v-for="detail in [
+                  { label: 'Bond percent', value: '100.00%' },
+                  { label: 'Max. amount',  value: '$2,500,000.00' },
+                  { label: 'Surety state', value: 'South Carolina' },
+                  { label: 'Surety name',  value: 'ABC Surety Company' },
+                  { label: 'Expiration',   value: '06/30/2026' },
+                  { label: 'Bond amount',  value: '$1,000,000.00' },
+                ]" :key="detail.label" class="proposal-detail-row">
+                  <span class="proposal-detail-label">{{ detail.label }}</span>
+                  <span class="proposal-detail-value">{{ detail.value }}</span>
+                </div>
+              </div>
+              <!-- Column B -->
+              <div class="proposal-detail-set">
+                <div v-for="detail in [
+                  { label: 'Effective date', value: '01/01/2026' },
+                  { label: 'NAIC code',      value: '12345' },
+                  { label: 'Obligee',        value: 'SCDOT' },
+                  { label: 'Agent name',     value: 'John B. Smith' },
+                  { label: 'Agent phone',    value: '(803) 555-0147' },
+                  { label: 'Reference no.',  value: '2026-SC-00291' },
+                ]" :key="detail.label" class="proposal-detail-row">
+                  <span class="proposal-detail-label">{{ detail.label }}</span>
+                  <span class="proposal-detail-value">{{ detail.value }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Optional slot -->
+        <div class="flex items-center justify-center mt-4 rounded min-h-[120px] bg-pink-100 border border-dashed border-pink-500">
+          <span class="text-xs text-pink-600">Slot</span>
+        </div>
+      </div>
+
+      <!-- ── Prev / Next navigation ──────────────────────────────────── -->
+      <div class="bid-page-nav print:hidden">
+        <cw-button
+          v-if="pageIndex < pages.length - 1"
+          style="order: 2"
+          theme="secondary"
+          content="Next"
+          size="md"
+          @click="goTo(pageIndex + 1)">
+          <cw-icon-arrow-right slot="icon-right"></cw-icon-arrow-right>
+        </cw-button>
+        <cw-button
+          v-if="pageIndex > 0"
+          style="order: 1"
+          theme="secondary"
+          content="Prev"
+          size="md"
+          @click="goTo(pageIndex - 1)">
+          <cw-icon-arrow-left slot="icon-left"></cw-icon-arrow-left>
+        </cw-button>
+      </div>
+
+    </div>
+    <!-- end main content -->
+
+    </div>
+    <!-- end body flex row -->
+
+  <!-- ═══ Mobile footer bar (md:hidden) ══════════════════════════════ -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-10 print:hidden">
+
+    <!-- Verification block — shown after Check bid -->
+    <Transition name="mobile-check">
+      <div v-if="checkResults"
+        :key="totalErrors > 0 ? 'errors' : 'ok'">
+        <div v-if="totalErrors > 0"
+          class="flex items-center gap-2 px-4 py-3 bg-cinnabar-500 text-cinnabar-50">
+          <span class="text-sm font-semibold">{{ totalErrors }} {{ totalErrors === 1 ? 'error' : 'errors' }}</span>
+          <cw-button size="sm" appearance="outlined" theme="secondary" aria-label="Previous error" @click="goPrevError">
+            <cw-icon-chevron-left slot="icon" size="xs"></cw-icon-chevron-left>
+          </cw-button>
+          <cw-button size="sm" appearance="outlined" theme="secondary" aria-label="Next error" @click="goNextError">
+            <cw-icon-chevron-right slot="icon" size="xs"></cw-icon-chevron-right>
+          </cw-button>
+          <button class="text-xs text-cinnabar-50" type="button" @click="openErrorsSlideout">View list</button>
+        </div>
+        <div v-else
+          class="flex items-center gap-3 px-4 py-3 bg-emerald-50 border-t border-emerald-200">
+          <cw-icon-check-circle-outline class="text-emerald-500 shrink-0" size="sm"></cw-icon-check-circle-outline>
+          <p class="text-sm font-semibold text-primary">No errors found</p>
+          <cw-button theme="secondary" appearance="outlined" size="sm" content="Dismiss" @click="dismissCheck"></cw-button>
+        </div>
+      </div>
+    </Transition>
+
+    <div class="flex w-full border-t border-specter-300 bg-specter-50 p-4">
+      <div class="flex w-full justify-between gap-2">
+        <div class="flex gap-2">
+          <cw-button :class="pageIndex === pages.length - 1 ? 'invisible' : ''" aria-label="Next form"
+            style="order: 2" theme="secondary" appearance="ghost" size="md" @click="goTo(pageIndex + 1)">
+            Next
+            <cw-icon-arrow-alt-right slot="icon-right"></cw-icon-arrow-alt-right>
+          </cw-button>
+          <cw-button :class="pageIndex === 0 ? 'invisible' : ''" aria-label="Previous form"
+            style="order: 1" theme="secondary" appearance="ghost" size="md" @click="goTo(pageIndex - 1)">
+            <cw-icon-arrow-alt-left slot="icon-left"></cw-icon-arrow-alt-left>
+            Prev
+          </cw-button>
+        </div>
+        <div class="flex gap-2">
+          <cw-button theme="secondary" appearance="filled" size="md" @click="runCheck">
+            Check
+          </cw-button>
+          <cw-button theme="primary" appearance="filled" size="md" @click="openSubmitSlideout">
+            <cw-icon-lightning slot="icon-left"></cw-icon-lightning>
+            Submit
+          </cw-button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Floating menus ═══════════════════════════════════════════════ -->
+
+  <!-- File menu -->
+  <cw-dropdown-menu for="file-trigger" strategy="fixed" class="print:hidden">
+    <cw-dropdown-menu-group>
+      <cw-dropdown-menu-item content="Create backup"></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Restore from backup"></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+    <cw-dropdown-menu-group>
+      <cw-dropdown-menu-item content="Close bid form"></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+    <cw-dropdown-menu-group>
+      <cw-dropdown-menu-item content="Download receipt" disabled></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Print" @click="print()"></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+  </cw-dropdown-menu>
+
+  <!-- Tools menu -->
+  <cw-dropdown-menu for="tools-trigger" strategy="fixed" class="print:hidden">
+    <cw-dropdown-menu-group>
+      <cw-dropdown-menu-item content="View active bids…" disabled></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+    <cw-dropdown-menu-group title="Item list">
+      <cw-dropdown-menu-item content="File type…" :caption="fileType" @click="openFileTypeSlideout"></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Import" caption="⇧ I"></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Export" caption="⇧ E"></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+    <cw-dropdown-menu-group>
+      <cw-dropdown-menu-item content="Reset items" theme="destructive" @click="openResetModal"></cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+  </cw-dropdown-menu>
+
+  <!-- ═══ Assign items slideout ════════════════════════════════════ -->
+  <cw-slideout id="assign-items-slideout" size="md" placement="right" footer-layout="fill" no-padding
+    :heading.prop="'Assign items to ' + (assignItemsVendor?.company || '')">
+
+    <div class="p-6 flex flex-col gap-6">
+
+      <!-- Items count + hide unassigned toggle -->
+      <div class="flex flex-wrap gap-x-8 gap-y-2 items-center justify-between">
+        <span class="text-xs text-secondary whitespace-nowrap">
+          <template v-if="assignItemsHideUnassigned">{{ assignItemsDraft.length }} of {{ scheduleSections.flatMap(s => s.items).length }} Items</template>
+          <template v-else>{{ scheduleSections.flatMap(s => s.items).length }} Items</template>
+        </span>
+        <cw-toggle size="sm" content="Hide unassigned" layout="left"
+          :checked.prop="assignItemsHideUnassigned"
+          @change="assignItemsHideUnassigned = $event.target.checked">
+        </cw-toggle>
+      </div>
+
+      <!-- Sections -->
+      <div class="flex flex-col gap-4">
+        <div v-for="section in scheduleSections" :key="section.id"
+          class="rounded flex flex-col gap-4 p-4 bg-specter-500">
+
+          <!-- Section header (collapsible) -->
+          <button type="button" class="flex gap-2 w-full px-1 text-left"
+            @click="assignItemsSectionsOpen[section.id] = !assignItemsSectionsOpen[section.id]">
+            <cw-icon-chevron-down v-if="assignItemsSectionsOpen[section.id]"
+              size="sm" class="shrink-0 self-start mt-px"></cw-icon-chevron-down>
+            <cw-icon-chevron-right v-else
+              size="sm" class="shrink-0 self-start mt-px"></cw-icon-chevron-right>
+            <div class="flex flex-1 flex-wrap gap-4 items-start min-w-0">
+              <div class="flex flex-1 flex-col gap-1 items-start min-w-[168px]">
+                <span class="text-xs font-semibold text-primary whitespace-nowrap">Section {{ section.number }}</span>
+                <span class="text-xs text-primary">{{ section.description }}</span>
+              </div>
+              <span class="text-xs text-secondary shrink-0 whitespace-nowrap">{{ sectionAssignedCount(section) }} items assigned</span>
+            </div>
+          </button>
+
+          <!-- Item rows -->
+          <div v-if="assignItemsSectionsOpen[section.id]"
+            class="border border-specter-500 rounded overflow-hidden bg-white">
+            <template v-for="item in section.items" :key="item.line">
+              <div v-if="!assignItemsHideUnassigned || assignItemsDraft.includes(item.line)"
+                class="relative flex gap-2 items-start bg-specter-50 border-b border-specter-500 last:border-b-0 px-4 py-3">
+                <!-- Headless checkbox covers the full row — click anywhere to toggle -->
+                <cw-h-checkbox class="absolute inset-1"
+                  :value="item.line"
+                  :checked.prop="assignItemsDraft.includes(item.line)"
+                  :aria-label="`Assign line ${item.line}`"
+                  @change="toggleAssignDraft(item.line)">
+                </cw-h-checkbox>
+                <!-- Visual checkbox — decorative only, tabindex="-1" -->
+                <div class="relative flex items-start p-0.5 shrink-0">
+                  <cw-checkbox size="md" tabindex="-1"
+                    :checked.prop="assignItemsDraft.includes(item.line)">
+                  </cw-checkbox>
+                </div>
+                <!-- Item details -->
+                <div class="flex-1 min-w-0 flex flex-col gap-1 text-xs font-medium text-primary">
+                  <div class="flex flex-wrap gap-x-4 items-center whitespace-nowrap">
+                    <span class="min-w-[60px]">Line {{ item.line }}</span>
+                    <span>{{ item.code }}</span>
+                  </div>
+                  <span>{{ item.description }}</span>
+                </div>
+              </div>
+            </template>
+          </div><!-- /item rows -->
+
+        </div><!-- /section -->
+      </div><!-- /sections -->
+
+    </div><!-- /body padding wrapper -->
+
+    <cw-button slot="actions-footer" theme="secondary" appearance="filled" size="md"
+      content="Cancel" @click="cancelAssignItems">
+    </cw-button>
+    <cw-button slot="actions-footer" theme="primary" appearance="filled" size="md"
+      content="Save" @click="saveAssignItems">
+    </cw-button>
+  </cw-slideout>
+
+  <!-- File type slideout -->
+  <cw-slideout id="file-type-slideout" heading="Bid form preferences" size="md" placement="right" footer-layout="fill" no-padding>
+    <div class="flex flex-col gap-6 p-6">
+      <div class="flex flex-col gap-1">
+        <cw-field-group>
+          <label slot="label" for="file-type-radio">File type</label>
+          <cw-radio-group id="file-type-radio" layout="inline" size="md" :value="tempFileType" @change="tempFileType = $event.target.value">
+            <cw-radio-button value="COL" content="COL" size="md"></cw-radio-button>
+            <cw-radio-button value="CSV" content="CSV" size="md"></cw-radio-button>
+            <cw-radio-button value="TAB" content="TAB" size="md"></cw-radio-button>
+          </cw-radio-group>
+        </cw-field-group>
+        <div class="flex items-center gap-1 text-xs text-secondary">
+          <cw-icon-info-outline size="sm" class="shrink-0"></cw-icon-info-outline>
+          <span>Default file format for item import/export</span>
+        </div>
+      </div>
+
+      <div v-show="tempFileType === 'COL'" class="flex flex-col gap-6 rounded-lg p-6 bg-specter-100">
+        <div class="flex flex-col gap-3">
+          <div class="flex gap-4 text-xs font-normal text-secondary">
+            <span class="flex-1">FIELD NAME</span>
+            <span class="w-[8.5rem]">FIELD SIZE</span>
+          </div>
+          <div v-for="field in colFields" :key="field.key" class="flex items-center gap-4">
+            <span class="flex-1 text-xs font-semibold text-primary">{{ field.label }}</span>
+            <cw-input-number size="sm" :value="String(tempFieldSizes[field.key])" @change="tempFieldSizes[field.key] = Number($event.target.value)" class="w-[8.5rem]"></cw-input-number>
+          </div>
+        </div>
+        <div class="flex justify-center">
+          <cw-button theme="primary" appearance="ghost" size="sm" content="Reset field sizes to default"
+            :disabled.prop="!fieldSizesModified" @click="resetFieldSizes"></cw-button>
+        </div>
+      </div>
+    </div>
+    <cw-button slot="actions-footer" theme="secondary" appearance="filled" size="md" content="Cancel" @click="closeFileTypeSlideout"></cw-button>
+    <cw-button slot="actions-footer" theme="primary" appearance="filled" size="md" content="Save" @click="saveFileType"></cw-button>
+  </cw-slideout>
+
+  <!-- Reset items modal -->
+  <!-- ═══ Add vendor modal ════════════════════════════════════════════ -->
+  <cw-modal id="add-vendor-modal" :heading.prop="vendorToEdit ? 'Change vendor' : 'Vendor'" size="sm" footer-layout="inline">
+    <div class="flex flex-col gap-4">
+
+      <!-- Company -->
+      <cw-field-group size="md">
+        <label slot="label" :for="vendorManualEntry ? 'vendor-company-input' : 'vendor-company-select'">Company</label>
+        <!-- Manual entry checkbox in hint slot -->
+        <cw-checkbox
+          slot="hint"
+          content="Manual entry"
+          size="md"
+          layout="inline"
+          :checked.prop="vendorManualEntry"
+          @change="vendorManualEntry = $event.target.checked">
+        </cw-checkbox>
+        <!-- Select (default) -->
+        <cw-select v-if="!vendorManualEntry"
+          id="vendor-company-select"
+          placeholder="Select"
+          size="md"
+          width="fill"
+          filterable
+          search-placeholder="Search vendors"
+          :required.prop="true"
+          :options.prop="vendorOptions"
+          :value.prop="newVendorCompany"
+          @change="newVendorCompany = $event.target.value">
+        </cw-select>
+        <!-- Manual text input -->
+        <cw-input v-else
+          id="vendor-company-input"
+          placeholder="Enter company name"
+          size="md"
+          width="fill"
+          :required.prop="true"
+          :value.prop="newVendorCompany"
+          @change="newVendorCompany = $event.target.value">
+        </cw-input>
+        <cw-field-errors v-show="vendorSaveAttempted" slot="errors"
+          :for="vendorManualEntry ? 'vendor-company-input' : 'vendor-company-select'"
+          size="md">
+        </cw-field-errors>
+      </cw-field-group>
+
+      <!-- ── Manual entry progressive fields ──────────────────────── -->
+      <!--
+        Manual + Conflict variant (not implemented):
+        If the entered Bidder ID matches a vendor already on the Agency list,
+        a cw-callout (theme="warning") should appear below the Bidder ID field
+        with a "Use vendor" action button. Clicking "Use vendor" reverts to the
+        default non-manual select with that vendor pre-selected.
+        The Bidder ID field should also show a custom error:
+        "Bidder ID can't match vendor from Agency list".
+      -->
+      <template v-if="vendorManualEntry">
+
+        <!-- Bidder ID -->
+        <cw-field-group size="md">
+          <label slot="label" for="vendor-modal-bidder-id">Bidder ID</label>
+          <cw-input
+            id="vendor-modal-bidder-id"
+            placeholder="Enter bidder ID"
+            size="md"
+            width="fill"
+            :required.prop="true"
+            :value.prop="vendorManualBidderId"
+            @change="vendorManualBidderId = $event.target.value">
+          </cw-input>
+          <cw-field-errors v-show="vendorSaveAttempted" slot="errors" for="vendor-modal-bidder-id" size="md"></cw-field-errors>
+        </cw-field-group>
+
+        <!-- Address -->
+        <cw-field-group size="md">
+          <label slot="label" for="vendor-modal-address">Address</label>
+          <cw-input
+            id="vendor-modal-address"
+            placeholder="Enter address"
+            size="md"
+            width="fill"
+            :required.prop="true"
+            :value.prop="vendorManualAddress"
+            @change="vendorManualAddress = $event.target.value">
+          </cw-input>
+          <cw-field-errors v-show="vendorSaveAttempted" slot="errors" for="vendor-modal-address" size="md"></cw-field-errors>
+        </cw-field-group>
+
+        <!-- City + State/Province -->
+        <div class="flex gap-3">
+          <cw-field-group size="md" class="flex-1 m-0">
+            <label slot="label" for="vendor-modal-city">City</label>
+            <cw-input
+              id="vendor-modal-city"
+              placeholder="City"
+              size="md"
+              width="fill"
+              :required.prop="true"
+              :value.prop="vendorManualCity"
+              @change="vendorManualCity = $event.target.value">
+            </cw-input>
+            <cw-field-errors v-show="vendorSaveAttempted" slot="errors" for="vendor-modal-city" size="md"></cw-field-errors>
+          </cw-field-group>
+          <cw-field-group size="md" class="w-28 m-0">
+            <label slot="label" for="vendor-modal-state">State/Province</label>
+            <cw-input
+              id="vendor-modal-state"
+              placeholder="State"
+              size="md"
+              width="fill"
+              :value.prop="vendorManualState"
+              @change="vendorManualState = $event.target.value">
+            </cw-input>
+            <cw-field-errors v-show="vendorSaveAttempted" slot="errors" for="vendor-modal-state" size="md"></cw-field-errors>
+          </cw-field-group>
+        </div>
+
+        <!-- Disadvantaged certification -->
+        <cw-field-group size="md">
+          <label slot="label" for="vendor-modal-cert">Disadvantaged certification</label>
+          <cw-radio-group
+            id="vendor-modal-cert"
+            layout="inline"
+            size="md"
+            :required.prop="true"
+            :value="vendorManualCert"
+            @change="vendorManualCert = $event.target.value">
+            <cw-radio-button value="dbe"     size="md" content="DBE"></cw-radio-button>
+            <cw-radio-button value="mbe"     size="md" content="MBE"></cw-radio-button>
+            <cw-radio-button value="wbe"     size="md" content="WBE"></cw-radio-button>
+            <cw-radio-button value="non-dbe" size="md" content="Non-DBE"></cw-radio-button>
+          </cw-radio-group>
+          <cw-field-errors v-show="vendorSaveAttempted" slot="errors" for="vendor-modal-cert" size="md"></cw-field-errors>
+        </cw-field-group>
+
+      </template>
+      <!-- ── End manual entry fields ──────────────────────────────── -->
+
+    </div>
+    <cw-button slot="actions" theme="secondary" content="Cancel" @click="closeAddVendorModal"></cw-button>
+    <cw-button slot="actions" theme="primary" content="Save" @click="saveVendor"></cw-button>
+  </cw-modal>
+
+  <!-- ═══ Duplicate vendor modal ══════════════════════════════════════ -->
+  <cw-modal id="duplicate-vendor-modal" heading="Duplicate vendor" size="md" footer-layout="inline" no-close>
+    <p class="text-base text-primary">
+      <strong>{{ pendingVendorName }}</strong> is already in your vendor list. Would you like to add a duplicate of this company?
+    </p>
+    <cw-button slot="actions" theme="secondary" content="Cancel" @click="cancelDuplicate"></cw-button>
+    <cw-button slot="actions" theme="primary" content="Add duplicate" @click="confirmAddDuplicate"></cw-button>
+  </cw-modal>
+
+  <!-- ═══ Remove vendor modal ═════════════════════════════════════════ -->
+  <cw-modal id="remove-vendor-modal" heading="Remove vendor" size="md" footer-layout="inline">
+    <div class="flex flex-col gap-4 text-base text-primary">
+      <p>Are you sure you want to remove <strong>{{ vendorToRemove?.company }}</strong>? This action can't be undone.</p>
+    </div>
+    <cw-button slot="actions" theme="destructive" content="Remove vendor" @click="confirmRemoveVendor"></cw-button>
+    <cw-button slot="actions" theme="secondary" content="Cancel" @click="closeRemoveVendorModal"></cw-button>
+  </cw-modal>
+
+  <cw-modal id="reset-items-modal" heading="Reset items" size="md" footer-layout="inline">
+    <div class="flex flex-col gap-4 text-base text-primary">
+      <p>Are you sure? This action can't be undone.</p>
+      <p>All item inputs for this proposal will be completely reset, including quantity and unit prices.</p>
+    </div>
+    <cw-button slot="actions" theme="destructive" content="Reset items" @click="resetItems"></cw-button>
+    <cw-button slot="actions" theme="secondary" content="Cancel" @click="closeResetModal"></cw-button>
+  </cw-modal>
+
+</div><!-- #app -->
+
+<script>
+const { createApp, ref, computed, watch, watchEffect, onMounted, nextTick } = Vue
+
+const app = createApp({
+  setup() {
+
+    // ── AGENCY CONFIGURATION ──────────────────────────────────────────────────
+    // Edit only this block when creating an agency-specific prototype.
+    // See template header comment for guidance on structural overrides.
+
+    const agencyAbbr     = 'DOTABBV'                           // Short ID shown in context bar, alerts, submit slideout
+    const agencyName     = 'Statename Department of Transportation' // Full name shown in submit slideout
+    const canAssignItems = ref(true)                            // false = single quote per vendor (no item assignment)
+    const bondGoalPct    = 10.00                                // Bond requirement as % of item total
+    const vendorGoals    = [                                    // [] if this agency has no DBE/SBE goals
+      { label: 'DBE', req: 5.00 },
+      { label: 'SBE', req: 3.00 },
+    ]
+    const bondTypeOptions = [                                   // Remove types not accepted by this agency
+      { value: 'electronic', content: 'Electronic verification' },
+      { value: 'esb',        content: 'Electronic surety bond (ESB)' },
+      { value: 'physical',   content: 'Physical bond' },
+      { value: 'check',      content: 'Certified check' },
+    ]
+
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const pages = ['general', 'schedule', 'sites', 'vendors', 'bidbond']
+    const activePage = ref('general')
+    const contextExpanded = ref(false)
+    const alertBanner = ref(false)
+    const bidSubmitted = ref(false)
+    const mobileNavOpen = ref(false)
+    const checkResults = ref(null) // null | { total, byPage: { pageId: [{ id, message }] } }
+    const currentErrorIndex = ref(0)
+    const submitView = ref(null) // null | 'review' | 'loading' | 'submitted'
+    const submitAcknowledged = ref(false)
+    const submitAcknowledgeAttempted = ref(false)
+    const selectedBidder = ref('')
+    const autoWithdraw = ref('')
+    const withdrawCallsMap = ref({ call010: false, call020: false })
+    const bondType = ref('')
+    const bondRegistry = ref('')
+    const bondId = ref('')
+    const bondVerified = ref(false)
+
+    const verifyAttempted = ref(false)
+
+    function verifyBond() {
+      verifyAttempted.value = true
+      let hasError = false
+
+      // Bidder / Bond ID check — show on Bond ID field
+      const bidderMsg = !selectedBidder.value ? 'A bidder must be selected before verifying' : null
+      const bondIdMsg = !bidderMsg && !bondId.value ? 'Bond ID is required' : null
+      if (bidderMsg || bondIdMsg) {
+        setErr('bond-id-input', true, bidderMsg || bondIdMsg)
+        hasError = true
+      } else {
+        setErr('bond-id-input', false, '')
+      }
+
+      // Registry check
+      if (!bondRegistry.value) {
+        setErr('bond-registry-radio', true, 'Registry is required')
+        hasError = true
+      } else {
+        setErr('bond-registry-radio', false, '')
+      }
+
+      if (hasError) return
+      bondVerified.value = true
+    }
+
+    function resetBond() {
+      bondVerified.value = false
+      verifyAttempted.value = false
+      setErr('bond-registry-radio', false, '')
+    }
+    const vendorCertified = ref(false)
+
+    // ── Totals helpers ──────────────────────────────────────────────
+    function onDaysChange(site, raw) {
+      const trimmed = String(raw ?? '').trim()
+      if (!trimmed) { site.days = ''; return }
+      site.days = parseAmount(trimmed).toFixed(2)
+    }
+
+    function parseAmount(val) {
+      if (val === '' || val == null) return 0
+      const n = parseFloat(String(val).replace(/,/g, ''))
+      return isNaN(n) ? 0 : n
+    }
+    function formatAmt(n) {
+      return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    }
+    function itemExtension(item) {
+      return parseAmount(item.qty) * parseAmount(item.unitPrice)
+    }
+    function sectionTotal(section) {
+      return section.items.reduce((sum, item) => sum + itemExtension(item), 0)
+    }
+    const itemTotal = computed(() =>
+      scheduleSections.value.flatMap(s => s.items).reduce((sum, item) => sum + itemExtension(item), 0)
+    )
+    const siteTotal = computed(() =>
+      siteItems.value.reduce((sum, site) => sum + parseAmount(site.days) * site.costPerDay, 0)
+    )
+    const bidTotal = computed(() => formatAmt(itemTotal.value + siteTotal.value))
+
+    const pageIndex = computed(() => pages.indexOf(activePage.value))
+
+    const allErrors = computed(() => {
+      if (!checkResults.value) return []
+      return Object.entries(checkResults.value.byPage).flatMap(([pageId, errors]) =>
+        errors.map(e => ({ ...e, pageId }))
+      )
+    })
+
+    const totalErrors = computed(() => allErrors.value.length)
+
+    const completionLabel = computed(() => {
+      const rules = validationRules.value
+      if (!rules.length) return '0% complete'
+      const completed = rules.filter(r => !r.invalid).length
+      const pct = Math.round((completed / rules.length) * 100)
+      return `${pct}% complete`
+    })
+
+    onMounted(() => {
+      const header = document.querySelector('cw-app-header')
+      const navSlideout = document.querySelector('#mobile-nav-slideout')
+      if (header && navSlideout) {
+        header.addEventListener('menu-toggle-click', () => navSlideout.open())
+      }
+      nextTick(() => {
+        const certSelect = document.querySelector('#cert-filter-select')
+        if (certSelect) certSelect.value = certFilter.value
+      })
+    })
+
+    // ─── Single source of truth for all required-field validation ───────────
+    // To add a new required field anywhere in the form, add one entry here.
+    // Each rule: { id, pageId, message, invalid }
+    //   id      — must match the HTML element's id attribute
+    //   pageId  — must match a key in the pages array ('general', 'schedule', etc.)
+    //   message — shown in the error list and on the field
+    //   invalid — reactive expression; true means the field has an error
+    //
+    // Conditional fields (e.g. only shown when a certain option is selected)
+    // use a spread with a ternary so they're only included when relevant.
+    const validationRules = computed(() => [
+      // General
+      { id: 'bidder-field',        pageId: 'general',  message: 'Bidder is required',                         invalid: !selectedBidder.value },
+      { id: 'auto-withdraw-radio',   pageId: 'general', message: 'Automatic bid withdrawal selection is required', invalid: !autoWithdraw.value },
+      ...(autoWithdraw.value === 'yes' ? [
+        { id: 'withdraw-calls-group', pageId: 'general', message: 'At least one call must be selected for automatic withdrawal', invalid: !Object.values(withdrawCallsMap.value).some(Boolean) },
+      ] : []),
+
+      // Schedule of items
+      ...scheduleSections.value.flatMap(section =>
+        section.items.map(item => ({
+          id: `price-${item.line}`,
+          pageId: 'schedule',
+          message: `Line ${item.line} unit price is required`,
+          invalid: !item.unitPrice,
+        }))
+      ),
+
+      // Sites
+      ...siteItems.value.flatMap(site => [
+        { id: `days-${site.id}`, pageId: 'sites', message: `Site ${site.number} working days is required`, invalid: !site.days },
+        ...(site.days && site.min && parseAmount(site.days) < site.min
+          ? [{ id: `days-${site.id}`, pageId: 'sites', message: `Site ${site.number} must be at least ${site.min} days (MIN)`, invalid: true }]
+          : []),
+        ...(site.days && site.max && parseAmount(site.days) > site.max
+          ? [{ id: `days-${site.id}`, pageId: 'sites', message: `Site ${site.number} cannot exceed ${site.max} days (MAX)`, invalid: true }]
+          : []),
+      ]),
+
+      // Vendor list — per-vendor fields
+      ...vendors.value.flatMap(vendor => [
+        // Quote: single input when canAssignItems is off; per-item quotes when on
+        ...(canAssignItems.value
+          ? vendor.assignedItems.map(ai => ({
+              id: `item-quote-${vendor.id}-${ai.line}`,
+              pageId: 'vendors',
+              message: `Quote required for Line ${ai.line}`,
+              invalid: !ai.itemQuote,
+            }))
+          : [{ id: `vendor-${vendor.id}-quote`, pageId: 'vendors', message: 'Quote is required', invalid: !vendor.quote }]
+        ),
+        { id: `vendor-${vendor.id}-class`,    pageId: 'vendors', message: 'Classification is required', invalid: !vendor.classification },
+        { id: `vendor-${vendor.id}-worktype`, pageId: 'vendors', message: 'Work type is required',      invalid: !vendor.workType },
+      ]),
+
+      // Vendor list — goals
+      ...vendorGoals.map(goal => ({
+        id: `goal-${goal.label.toLowerCase()}`,
+        pageId: 'vendors',
+        message: `Required ${goal.label} goal not met`,
+        invalid: goalActualPct(goal) < goal.req,
+      })),
+      { id: 'vendor-cert-checkbox', pageId: 'vendors', message: 'Certification acknowledgment is required', invalid: !vendorCertified.value },
+
+      // Bid bond — always
+      { id: 'bond-type-select', pageId: 'bidbond', message: 'Bond type is required', invalid: !bondType.value },
+
+      // Bid bond — electronic only
+      ...(bondType.value === 'electronic' ? [
+        { id: 'bond-registry-radio', pageId: 'bidbond', message: 'Registry is required',  invalid: !bondRegistry.value },
+        { id: 'bond-id-input',       pageId: 'bidbond', message: 'Bond must be verified', invalid: !bondVerified.value },
+      ] : []),
+    ])
+
+    const checkAttempted = ref(false)
+
+    function computeCheck() {
+      checkAttempted.value = true
+      const byPage = {}
+      for (const rule of validationRules.value) {
+        if (rule.invalid) {
+          if (!byPage[rule.pageId]) byPage[rule.pageId] = []
+          byPage[rule.pageId].push({ id: rule.id, message: rule.message })
+        }
+      }
+      checkResults.value = { total: Object.values(byPage).flat().length, byPage }
+      currentErrorIndex.value = 0
+      nextTick(() => applyErrorStates())
+    }
+
+    function setErr(id, hasError, msg) {
+      const el = document.getElementById(id)
+      if (!el) return
+      if (hasError) {
+        el.setAttribute('custom-error', msg)
+        el.setAttribute('touched', '')
+        el.setAttribute('form-dirty', '')
+      } else {
+        el.removeAttribute('custom-error')
+        el.removeAttribute('touched')
+        el.removeAttribute('form-dirty')
+      }
+    }
+
+    async function applyErrorStates() {
+      // Expand any vendor cards that have errors so their inputs are in the DOM
+      for (const rule of validationRules.value) {
+        if (!rule.invalid) continue
+        const vendorId = rule.id.startsWith('vendor-') ? Number(rule.id.split('-')[1])
+          : rule.id.startsWith('item-quote-') ? Number(rule.id.split('-')[2])
+          : null
+        if (vendorId) {
+          const vendor = vendors.value.find(v => v.id === vendorId)
+          if (vendor && !vendor.expanded) vendor.expanded = true
+        }
+      }
+      // Wait for expanded cards to render before applying error attributes
+      await nextTick()
+
+      for (const rule of validationRules.value) {
+        setErr(rule.id, rule.invalid, rule.message)
+      }
+
+      // Gate cw-field-errors for registry (rendered only after verify attempt or check)
+      if (bondType.value === 'electronic' && !bondRegistry.value) {
+        verifyAttempted.value = true
+      }
+    }
+
+    function runCheck() {
+      computeCheck()
+      if (totalErrors.value > 0) {
+        const firstPage = Object.entries(checkResults.value.byPage).find(([, errs]) => errs.length > 0)?.[0]
+        if (firstPage) activePage.value = firstPage
+        nextTick(() => document.querySelector('#bid-errors-slideout')?.open())
+      }
+    }
+
+    const DEFAULT_FIELD_SIZES = { lineNumber: 6, altCode: 6, itemNumber: 15, qty: 16, unit: 6, unitPrice: 16, description: 120 }
+    const fileType = ref('COL')
+    const tempFileType = ref('COL')
+    const fieldSizes = ref({ ...DEFAULT_FIELD_SIZES })
+    const tempFieldSizes = ref({ ...DEFAULT_FIELD_SIZES })
+    const colFields = [
+      { key: 'lineNumber',  label: 'Line number'   },
+      { key: 'altCode',     label: 'Alternate code' },
+      { key: 'itemNumber',  label: 'Item number'    },
+      { key: 'qty',         label: 'Quantity'       },
+      { key: 'unit',        label: 'Unit'           },
+      { key: 'unitPrice',   label: 'Unit price'     },
+      { key: 'description', label: 'Description'    },
+    ]
+    const fieldSizesModified = computed(() =>
+      Object.keys(DEFAULT_FIELD_SIZES).some(k => tempFieldSizes.value[k] !== DEFAULT_FIELD_SIZES[k])
+    )
+    function resetFieldSizes() {
+      Object.assign(tempFieldSizes.value, DEFAULT_FIELD_SIZES)
+    }
+    async function openFileTypeSlideout() {
+      document.querySelector('#file-type-slideout')?.open()
+      await nextTick()
+      tempFileType.value = fileType.value
+      Object.assign(tempFieldSizes.value, fieldSizes.value)
+    }
+    function closeFileTypeSlideout() {
+      document.querySelector('#file-type-slideout')?.close()
+    }
+    function saveFileType() {
+      fileType.value = tempFileType.value
+      Object.assign(fieldSizes.value, tempFieldSizes.value)
+      closeFileTypeSlideout()
+    }
+
+    function openAmendmentsSlideout() {
+      document.querySelector('#amendments-slideout')?.open()
+    }
+
+    function printAmendments() {
+      document.body.classList.add('print-amendments')
+      window.print()
+      document.body.classList.remove('print-amendments')
+    }
+
+    function openResetModal() { document.querySelector('#reset-items-modal')?.open() }
+    function closeResetModal() { document.querySelector('#reset-items-modal')?.close() }
+
+    function resetItems() {
+      scheduleSections.value.forEach(section => {
+        section.items.forEach(item => { item.unitPrice = '' })
+      })
+      closeResetModal()
+    }
+
+    function openSubmitSlideout() {
+      computeCheck()
+      submitView.value = 'review'
+      submitAcknowledged.value = false
+      submitAcknowledgeAttempted.value = false
+      setErr('submit-acknowledge-checkbox', false, '')
+      nextTick(() => document.querySelector('#submit-bid-slideout')?.open())
+    }
+
+    function closeSubmitSlideout() {
+      document.querySelector('#submit-bid-slideout')?.close()
+    }
+
+    function onAcknowledgeChange(checked) {
+      submitAcknowledged.value = checked
+      if (submitAcknowledgeAttempted.value) {
+        setErr('submit-acknowledge-checkbox', !checked, 'Acknowledgment is required to submit with errors')
+      }
+    }
+
+    async function doSubmit() {
+      if (totalErrors.value > 0 && !submitAcknowledged.value) {
+        submitAcknowledgeAttempted.value = true
+        await nextTick()
+        setErr('submit-acknowledge-checkbox', true, 'Acknowledgment is required to submit with errors')
+        return
+      }
+      submitView.value = 'loading'
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      submitView.value = 'submitted'
+      bidSubmitted.value = true
+    }
+
+    function submitDone() {
+      closeSubmitSlideout()
+      setTimeout(() => { submitView.value = null }, 300)
+    }
+
+    function navigateToError(error) {
+      activePage.value = error.pageId
+      // Auto-expand vendor card if error belongs to a vendor field or item quote
+      const vendorId = error.id.startsWith('vendor-') ? Number(error.id.split('-')[1])
+        : error.id.startsWith('item-quote-') ? Number(error.id.split('-')[2])
+        : null
+      if (vendorId) {
+        const vendor = vendors.value.find(v => v.id === vendorId)
+        if (vendor) vendor.expanded = true
+      }
+      nextTick(() => {
+        document.querySelectorAll('[data-active-error]').forEach(e => e.removeAttribute('data-active-error'))
+        const el = document.getElementById(error.id)
+        el?.scrollIntoView({ behavior: 'instant', block: 'center' })
+        const isGroup = ['CW-RADIO-GROUP', 'CW-CHECKBOX', 'CW-CHECKBOX-GROUP'].includes(el?.tagName)
+        if (isGroup) {
+          el?.setAttribute('data-active-error', '')
+        } else {
+          setTimeout(() => el?.focus(), 350)
+        }
+      })
+    }
+
+    function goPrevError() {
+      if (!allErrors.value.length) return
+      currentErrorIndex.value = (currentErrorIndex.value - 1 + allErrors.value.length) % allErrors.value.length
+      navigateToError(allErrors.value[currentErrorIndex.value])
+    }
+
+    function goNextError() {
+      if (!allErrors.value.length) return
+      currentErrorIndex.value = (currentErrorIndex.value + 1) % allErrors.value.length
+      navigateToError(allErrors.value[currentErrorIndex.value])
+    }
+
+    function openErrorsSlideout() {
+      document.querySelector('#bid-errors-slideout')?.open()
+    }
+
+    function closeErrorsSlideout() {
+      document.querySelector('#bid-errors-slideout')?.close()
+    }
+
+    function selectErrorAndClose(errorId, pageId) {
+      const idx = allErrors.value.findIndex(e => e.id === errorId)
+      if (idx !== -1) currentErrorIndex.value = idx
+      document.querySelector('#bid-errors-slideout')?.close()
+      navigateToError({ id: errorId, pageId })
+    }
+
+    function dismissCheck() {
+      checkResults.value = null
+    }
+
+    function closeMobileNav() {
+      const navSlideout = document.querySelector('#mobile-nav-slideout')
+      if (navSlideout) navSlideout.close()
+    }
+
+    function scrollToTop() {
+      nextTick(() => {
+        const el = document.querySelector('.bid-content-area')
+        if (el) el.scrollTop = 0
+      })
+    }
+    function goTo(index) {
+      activePage.value = pages[index]
+      scrollToTop()
+    }
+    function setPage(id) {
+      activePage.value = id
+      scrollToTop()
+    }
+
+    function goToScheduleItem(line) {
+      activePage.value = 'schedule'
+      nextTick(() => {
+        const el = document.getElementById('schedule-item-' + line)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+    }
+
+    // Per-line overcommitment allowance flags { [line]: boolean }
+    const overcommitMap = ref({})
+
+    // Returns [{ vendor, assignedItem }] for all vendors assigned to a given line, sorted A–Z by company
+    function assigneesForLine(line) {
+      return vendors.value
+        .flatMap(v => {
+          const ai = v.assignedItems.find(a => a.line === line)
+          return ai ? [{ vendor: v, assignedItem: ai }] : []
+        })
+        .sort((a, b) => a.vendor.company.localeCompare(b.vendor.company))
+    }
+
+    // Returns true when the sum of vendor quotes for a line exceeds the line extension
+    function isLineOvercommitted(line) {
+      let schedItem = null
+      for (const section of scheduleSections.value) {
+        schedItem = section.items.find(i => i.line === line)
+        if (schedItem) break
+      }
+      if (!schedItem) return false
+      const ext = itemExtension(schedItem)
+      if (!ext) return false
+      const totalQuotes = assigneesForLine(line).reduce(
+        (sum, { assignedItem: ai }) => sum + parseAmount(ai.itemQuote), 0
+      )
+      return totalQuotes > ext
+    }
+
+    function goToVendor(vendor) {
+      activePage.value = 'vendors'
+      vendor.expanded = true
+      nextTick(() => {
+        const el = document.getElementById('vendor-card-' + vendor.id)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      })
+    }
+
+    const bidderOptions = [
+      { value: 'abc',  content: 'ABC Construction, Inc.',              address: '1234 Industrial Pkwy, Columbia, SC 29201' },
+      { value: 'sec',  content: 'Southeast Bridge Contractors, LLC',   address: '567 River Rd, Greenville, SC 29601' },
+      { value: 'palm', content: 'Palmetto Civil Construction',         address: '890 Trade Center Blvd, Charleston, SC 29403' },
+      { value: 'chb',  content: 'Carolina Highway Builders',           address: '321 Main St, Charlotte, NC 28202' },
+      { value: 'tri',  content: 'Tri-State Infrastructure Partners',   address: '456 Commerce Dr, Augusta, GA 30901' },
+    ]
+
+    // ── Add vendor modal ────────────────────────────────────────────
+    const newVendorCompany    = ref('')
+    const vendorManualEntry   = ref(false)
+    const vendorManualBidderId = ref('')
+    const vendorManualAddress  = ref('')
+    const vendorManualCity     = ref('')
+    const vendorManualState    = ref('')
+    const vendorManualCert     = ref('')
+    const vendorSaveAttempted  = ref(false)
+    const vendors = ref([])
+    const hideUnused = ref(false)
+    const vendorSort = ref('asc')
+    const certFilter = ref('any')
+    // ── Assign items slideout ─────────────────────────────────────
+    const assignItemsVendorId = ref(null)
+    const assignItemsDraft = ref([])          // array of line strings currently checked
+    const assignItemsHideUnassigned = ref(false)
+    const assignItemsSectionsOpen = ref({})
+
+    const assignItemsVendor = computed(() =>
+      vendors.value.find(v => v.id === assignItemsVendorId.value)
+    )
+
+    function openAssignItems(vendor) {
+      assignItemsVendorId.value = vendor.id
+      assignItemsDraft.value = vendor.assignedItems.map(ai => ai.line)
+      assignItemsHideUnassigned.value = false
+      const openState = {}
+      scheduleSections.value.forEach(s => { openState[s.id] = true })
+      assignItemsSectionsOpen.value = openState
+      nextTick(() => document.querySelector('#assign-items-slideout')?.open())
+    }
+
+    function saveAssignItems() {
+      const vendor = assignItemsVendor.value
+      if (!vendor) return
+      const existingMap = Object.fromEntries(vendor.assignedItems.map(ai => [ai.line, ai]))
+      vendor.assignedItems = assignItemsDraft.value.map(line => {
+        if (existingMap[line]) return existingMap[line]
+        const item = scheduleSections.value.flatMap(s => s.items).find(i => i.line === line)
+        return { line, code: item?.code || '', description: item?.description || '', itemQuote: '', note: '', showNote: false }
+      })
+      document.querySelector('#assign-items-slideout')?.close()
+    }
+
+    function cancelAssignItems() {
+      document.querySelector('#assign-items-slideout')?.close()
+    }
+
+    function toggleAssignDraft(line) {
+      const idx = assignItemsDraft.value.indexOf(line)
+      if (idx >= 0) assignItemsDraft.value.splice(idx, 1)
+      else assignItemsDraft.value.push(line)
+    }
+
+    function sectionAssignedCount(section) {
+      return section.items.filter(i => assignItemsDraft.value.includes(i.line)).length
+    }
+
+    function removeAssignedItem(vendor, line) {
+      vendor.assignedItems = vendor.assignedItems.filter(ai => ai.line !== line)
+    }
+
+    function toggleItemNote(ai) {
+      ai.showNote = !ai.showNote
+      if (!ai.showNote) ai.note = ''
+    }
+
+    const availableCertTypes = computed(() => {
+      const counts = {}
+      vendors.value.forEach(v => {
+        v.certTypes?.forEach(ct => {
+          counts[ct] = (counts[ct] || 0) + 1
+        })
+      })
+      return Object.entries(counts)
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([cert, count]) => ({ cert, count }))
+    })
+
+    const filteredVendors = computed(() => {
+      let list = vendors.value
+      if (hideUnused.value) list = list.filter(v => v.selected)
+      if (certFilter.value !== 'any') list = list.filter(v => v.certTypes?.includes(certFilter.value))
+      list = [...list].sort((a, b) => {
+        const cmp = a.company.localeCompare(b.company)
+        return vendorSort.value === 'asc' ? cmp : -cmp
+      })
+      return list
+    })
+
+    watch(certFilter, async (val) => {
+      await nextTick()
+      const certSelect = document.querySelector('#cert-filter-select')
+      if (certSelect) certSelect.value = val
+    })
+
+    const CLASSIFICATION_MULTIPLIERS = { supplier: 0.6, distributor: 0.4 }
+
+    function classificationMultiplier(vendor) {
+      return CLASSIFICATION_MULTIPLIERS[vendor.classification] ?? 1
+    }
+
+    function vendorItemsTotal(vendor) {
+      const raw = vendor.assignedItems?.length
+        ? vendor.assignedItems.reduce((sum, ai) => sum + parseAmount(ai.itemQuote), 0)
+        : parseAmount(vendor.quote)
+      return raw * classificationMultiplier(vendor)
+    }
+
+    const selectedVendorTotal = computed(() =>
+      vendors.value.filter(v => v.selected).reduce((sum, v) => sum + vendorItemsTotal(v), 0)
+    )
+
+    const vendorCertOptions = [
+      { value: 'dbe',     content: 'DBE' },
+      { value: 'mbe',     content: 'MBE' },
+      { value: 'wbe',     content: 'WBE' },
+      { value: 'non-dbe', content: 'Non-DBE' },
+    ]
+
+    const vendorOptions = [
+      { value: 'acme-dbe',    content: 'ACME CONCRETE SUPPLY',              caption: '1AC041 (DBE) | COLUMBIA, SC',       layout: 'vertical', certCode: '1AC041', certTypes: ['DBE'], address: '1041 INDUSTRIAL BLVD, COLUMBIA, SC 29201' },
+      { value: 'bluestone',   content: 'BLUESTONE PAVING LLC',              caption: '1BL089 | CHARLESTON, SC',           layout: 'vertical', certCode: '1BL089', certTypes: [],      address: '89 HARBOR VIEW DR, CHARLESTON, SC 29403' },
+      { value: 'carolina-sb', content: 'CAROLINA STEEL & BRIDGE',           caption: '1CA203 (SBE) | GREENVILLE, SC',     layout: 'vertical', certCode: '1CA203', certTypes: ['SBE'], address: '203 STEEL WAY, GREENVILLE, SC 29601' },
+      { value: 'delta-elec',  content: 'DELTA ELECTRICAL CONTRACTORS',      caption: '1DE117 | COLUMBIA, SC',             layout: 'vertical', certCode: '1DE117', certTypes: [],      address: '117 POWER LINE RD, COLUMBIA, SC 29205' },
+      { value: 'ez-asphalt',  content: 'EZ ASPHALT CO.',                    caption: '1EZ055 (SWBE) | FLORENCE, SC',     layout: 'vertical', certCode: '1EZ055', certTypes: ['SBE', 'WBE'], address: '55 PAVING WAY, FLORENCE, SC 29501' },
+      { value: 'fairway',     content: 'FAIRWAY GRADING & EXCAVATION',      caption: '1FA078 | SPARTANBURG, SC',          layout: 'vertical', certCode: '1FA078', certTypes: [],      address: '78 GRADE RD, SPARTANBURG, SC 29301' },
+      { value: 'grand-crane', content: 'GRAND CRANE & RIGGING',             caption: '1GR312 (SBE) | ROCK HILL, SC',      layout: 'vertical', certCode: '1GR312', certTypes: ['SBE'], address: '312 CRANE BLVD, ROCK HILL, SC 29730' },
+      { value: 'harbor-util', content: 'HARBOR UTILITIES INC.',             caption: '1HA190 | BEAUFORT, SC',             layout: 'vertical', certCode: '1HA190', certTypes: [],      address: '190 COASTAL HWY, BEAUFORT, SC 29902' },
+      { value: 'irongate',    content: 'IRONGATE CONSTRUCTION GROUP',       caption: '1IR044 (DBE) | SUMTER, SC',         layout: 'vertical', certCode: '1IR044', certTypes: ['DBE'], address: '44 IRON GATE LN, SUMTER, SC 29150' },
+      { value: 'junction-tr', content: 'JUNCTION TRANSPORT LLC',            caption: '1JU067 | ORANGEBURG, SC',           layout: 'vertical', certCode: '1JU067', certTypes: [],      address: '67 DEPOT ST, ORANGEBURG, SC 29115' },
+    ]
+
+    const classificationOptions = [
+      { value: 'subcontractor', content: 'Subcontractor', size: 'sm' },
+      { value: 'supplier',      content: 'Supplier',      caption: '(calculated @ 60%)', size: 'sm' },
+      { value: 'distributor',   content: 'Distributor',   caption: '(calculated @ 40%)', size: 'sm' },
+      { value: 'manufacturer',  content: 'Manufacturer',  size: 'sm' },
+      { value: 'trucking',      content: 'Trucking',      size: 'sm' },
+    ]
+
+    const workTypeOptions = [
+      { value: 'general',    content: 'General Construction', size: 'sm' },
+      { value: 'paving',     content: 'Paving & Asphalt',     size: 'sm' },
+      { value: 'concrete',   content: 'Concrete',             size: 'sm' },
+      { value: 'electrical', content: 'Electrical',           size: 'sm' },
+      { value: 'grading',    content: 'Grading & Excavation', size: 'sm' },
+      { value: 'steel',      content: 'Structural Steel',     size: 'sm' },
+      { value: 'utilities',  content: 'Utilities',            size: 'sm' },
+      { value: 'trucking',   content: 'Trucking',             size: 'sm' },
+      { value: 'crane',      content: 'Crane & Rigging',      size: 'sm' },
+    ]
+
+    const vendorToEdit   = ref(null)
+    const vendorToRemove = ref(null)
+
+    function openAddVendorModal() {
+      vendorToEdit.value = null
+      newVendorCompany.value = ''
+      vendorManualEntry.value = false
+      vendorManualBidderId.value = ''
+      vendorManualAddress.value  = ''
+      vendorManualCity.value     = ''
+      vendorManualState.value    = ''
+      vendorManualCert.value     = ''
+      resetAddVendorModal()
+      nextTick(() => document.querySelector('#add-vendor-modal')?.open())
+    }
+    function resetAddVendorModal() {
+      vendorSaveAttempted.value = false
+      setErr('vendor-company-select',  false, '')
+      setErr('vendor-company-input',   false, '')
+      setErr('vendor-modal-bidder-id', false, '')
+      setErr('vendor-modal-address',   false, '')
+      setErr('vendor-modal-city',      false, '')
+      setErr('vendor-modal-cert',      false, '')
+    }
+    function closeAddVendorModal() {
+      resetAddVendorModal()
+      document.querySelector('#add-vendor-modal')?.close()
+    }
+    function openChangeVendorModal(vendor) {
+      vendorToEdit.value = vendor
+      resetAddVendorModal()
+      vendorManualEntry.value = vendor.manual ?? false
+      newVendorCompany.value = vendor.manual
+        ? vendor.company
+        : (vendorOptions.find(o => o.content === vendor.company)?.value ?? '')
+      if (vendor.manual) {
+        vendorManualBidderId.value = vendor.bidderId ?? ''
+        vendorManualAddress.value  = vendor.addressLine ?? ''
+        vendorManualCity.value     = vendor.city  ?? ''
+        vendorManualState.value    = vendor.state ?? ''
+        vendorManualCert.value     = (vendor.certTypes?.[0] ?? '').toLowerCase()
+      } else {
+        vendorManualBidderId.value = ''
+        vendorManualAddress.value  = ''
+        vendorManualCity.value     = ''
+        vendorManualState.value    = ''
+        vendorManualCert.value     = ''
+      }
+      nextTick(() => document.querySelector('#add-vendor-modal')?.open())
+    }
+    // Resolved display name for whatever is currently staged in the vendor modal
+    const pendingVendorName = computed(() => {
+      const opt = vendorOptions.find(o => o.value === newVendorCompany.value)
+      return vendorManualEntry.value ? newVendorCompany.value : (opt?.content ?? newVendorCompany.value)
+    })
+
+    function isDuplicateVendor() {
+      const name = pendingVendorName.value
+      if (!name) return false
+      return vendors.value.some(v =>
+        v.company === name && (!vendorToEdit.value || v.id !== vendorToEdit.value.id)
+      )
+    }
+
+    function doSaveVendor() {
+      const opt = vendorOptions.find(o => o.value === newVendorCompany.value)
+      const isManual = vendorManualEntry.value
+      const certType = isManual && vendorManualCert.value
+        ? [vendorManualCert.value.toUpperCase()]
+        : (opt?.certTypes ?? [])
+      const configuredGoals = new Set(vendorGoals.map(g => g.label.toUpperCase()))
+      const firstEligibleGoal = certType.find(ct => configuredGoals.has(ct.toUpperCase())) ?? ''
+      if (vendorToEdit.value) {
+        const v = vendorToEdit.value
+        v.company     = isManual ? newVendorCompany.value  : (opt?.content  ?? newVendorCompany.value)
+        v.manual      = isManual
+        v.bidderId    = isManual ? vendorManualBidderId.value : ''
+        v.certCode    = isManual ? '' : (opt?.certCode ?? '')
+        v.certTypes      = certType
+        v.goalAttribution = firstEligibleGoal
+        v.addressLine = isManual ? vendorManualAddress.value : ''
+        v.city        = isManual ? vendorManualCity.value    : ''
+        v.state       = isManual ? vendorManualState.value   : ''
+        v.address     = isManual
+          ? [vendorManualAddress.value, vendorManualCity.value, vendorManualState.value].filter(Boolean).join(', ')
+          : (opt?.address ?? '')
+        if (!isManual && (opt?.certTypes?.length ?? 0) > 0) {
+          v.useTowardGoal = true
+        }
+        vendorToEdit.value = null
+      } else {
+        vendors.value.push({
+          id: Date.now(),
+          company:     isManual ? newVendorCompany.value  : (opt?.content  ?? newVendorCompany.value),
+          manual:      isManual,
+          bidderId:    isManual ? vendorManualBidderId.value : '',
+          certCode:    isManual ? '' : (opt?.certCode  ?? ''),
+          certTypes:   certType,
+          addressLine: isManual ? vendorManualAddress.value : '',
+          city:        isManual ? vendorManualCity.value    : '',
+          state:       isManual ? vendorManualState.value   : '',
+          address:     isManual
+            ? [vendorManualAddress.value, vendorManualCity.value, vendorManualState.value].filter(Boolean).join(', ')
+            : (opt?.address ?? ''),
+          selected: true,
+          expanded: true,
+          quote: '',
+          classification: '',
+          workType: '',
+          useTowardGoal:    (firstEligibleGoal !== ''),
+          goalAttribution:  firstEligibleGoal,
+          assignedItems: [],
+        })
+      }
+      closeAddVendorModal()
+    }
+
+    function saveVendor() {
+      vendorSaveAttempted.value = true
+      const inputId = vendorManualEntry.value ? 'vendor-company-input' : 'vendor-company-select'
+      let hasError = false
+
+      if (!newVendorCompany.value) {
+        setErr(inputId, true, 'Company is required')
+        hasError = true
+      } else {
+        setErr(inputId, false, '')
+      }
+
+      if (vendorManualEntry.value) {
+        if (!vendorManualBidderId.value) {
+          setErr('vendor-modal-bidder-id', true, 'Bidder ID is required')
+          hasError = true
+        } else {
+          setErr('vendor-modal-bidder-id', false, '')
+        }
+        if (!vendorManualAddress.value) {
+          setErr('vendor-modal-address', true, 'Address is required')
+          hasError = true
+        } else {
+          setErr('vendor-modal-address', false, '')
+        }
+        if (!vendorManualCity.value) {
+          setErr('vendor-modal-city', true, 'City is required')
+          hasError = true
+        } else {
+          setErr('vendor-modal-city', false, '')
+        }
+        if (!vendorManualCert.value) {
+          setErr('vendor-modal-cert', true, 'Certification is required')
+          hasError = true
+        } else {
+          setErr('vendor-modal-cert', false, '')
+        }
+      }
+
+      if (hasError) return
+
+      if (isDuplicateVendor()) {
+        closeAddVendorModal()
+        nextTick(() => document.querySelector('#duplicate-vendor-modal')?.open())
+        return
+      }
+      doSaveVendor()
+    }
+    function cancelDuplicate() {
+      document.querySelector('#duplicate-vendor-modal')?.close()
+      nextTick(() => document.querySelector('#add-vendor-modal')?.open())
+    }
+    function confirmAddDuplicate() {
+      document.querySelector('#duplicate-vendor-modal')?.close()
+      doSaveVendor()
+    }
+    function removeVendor(vendor) {
+      vendors.value = vendors.value.filter(v => v.id !== vendor.id)
+    }
+    function openRemoveVendorModal(vendor) {
+      vendorToRemove.value = vendor
+      nextTick(() => document.querySelector('#remove-vendor-modal')?.open())
+    }
+    function closeRemoveVendorModal() {
+      document.querySelector('#remove-vendor-modal')?.close()
+    }
+    function confirmRemoveVendor() {
+      if (vendorToRemove.value) {
+        removeVendor(vendorToRemove.value)
+        vendorToRemove.value = null
+      }
+      closeRemoveVendorModal()
+    }
+
+    const certOptions = [
+      { value: 'any', content: 'Any certification' },
+      { value: 'dbe', content: 'DBE' },
+      { value: 'sbe', content: 'SBE' },
+      { value: 'none', content: 'Non-certified' },
+    ]
+
+    const amendments = [
+      {
+        id: '002', label: 'Amendment 002', isNew: true,
+        date: '04/11/2027', note: 'Minor scope clarification and item quantity update.',
+        groups: [
+          { title: 'General Changes', items: ['Acknowledgments form has changed'] },
+        ]
+      },
+      {
+        id: '001', label: 'Amendment 001', isNew: false,
+        date: '03/28/2027', note: 'Initial scope addition for bridge approach work.',
+        groups: [
+          { title: 'Added Items', items: ['Line 0070 5033000 CONCRETE CLASS AA', 'Line 0080 5040100 REINFORCING STEEL'] },
+          { title: 'Changed Items', items: ['Line 0010 1031000 MOBILIZATION', 'Line 0020 1031200 BRIDGE CONSTRUCTION ACCESS'] },
+        ]
+      },
+    ]
+
+    // Dollar sum per goal label — selected vendors with useTowardGoal on,
+    // attributed to vendor.goalAttribution (single goal, chosen via radio when cert is multi-goal eligible)
+    const vendorGoalActuals = computed(() =>
+      vendors.value
+        .filter(v => v.selected && v.useTowardGoal && v.goalAttribution)
+        .reduce((acc, v) => {
+          const key = v.goalAttribution.toUpperCase()
+          acc[key] = (acc[key] ?? 0) + vendorItemsTotal(v)
+          return acc
+        }, {})
+    )
+
+    // Returns only the cert types that match a configured goal on this proposal
+    function vendorEligibleGoals(vendor) {
+      const configured = new Set(vendorGoals.map(g => g.label.toUpperCase()))
+      return (vendor.certTypes ?? []).filter(ct => configured.has(ct.toUpperCase()))
+    }
+
+    function goalActualDollars(goal) {
+      return vendorGoalActuals.value[goal.label.toUpperCase()] ?? 0
+    }
+    function goalActualPct(goal) {
+      if (!itemTotal.value) return 0
+      return goalActualDollars(goal) / itemTotal.value * 100
+    }
+    function goalTargetAmt(goal) {
+      return formatAmt(goal.req / 100 * itemTotal.value)
+    }
+    function goalActualAmt(goal) {
+      return formatAmt(goalActualDollars(goal))
+    }
+    function goalProgress(goal) {
+      const pct = goalActualPct(goal)
+      if (pct > 0 && pct >= goal.req) return 'complete'
+      if (checkAttempted.value) return 'invalid'
+      return 'incomplete'
+    }
+    // 0–1 fraction for cw-progress :value — capped at 1 when met/exceeded
+    function goalProgressValue(goal) {
+      if (!goal.req) return 0
+      return Math.min(goalActualPct(goal) / goal.req, 1)
+    }
+
+    const siteItems = ref([
+      { id: 'S001', number: '0001', type: 'BRIDGE', description: 'Bridge Replacement S-11-286 (Indian Springs Rd) over Kings Creek', costPerDay: 2500.00, min: 120, max: 180, days: '' },
+      { id: 'S002', number: '0002', type: 'ROAD',   description: 'Approach Roadway Grading, Base Course, and Paving', costPerDay: 1500.00, min: 60,  max: null, days: '' },
+      { id: 'S003', number: '0003', type: 'TEMP',   description: 'Temporary Detour Route Maintenance and Traffic Control', costPerDay: 800.00,  min: null, max: null, days: '' },
+    ])
+
+    const navItems = [
+      { id: 'general',         label: 'General'           },
+      { id: 'schedule',        label: 'Schedule of items' },
+      { id: 'sites',           label: 'Sites'             },
+      { id: 'vendors',         label: 'Vendor list'       },
+      { id: 'bidbond',         label: 'Bid bond'          },
+    ]
+
+    const pageComplete = computed(() => {
+      const result = {}
+      for (const page of navItems) {
+        const rules = validationRules.value.filter(r => r.pageId === page.id)
+        result[page.id] = rules.length > 0 && rules.every(r => !r.invalid)
+      }
+      return result
+    })
+
+    const scheduleSections = ref([
+      {
+        id: '1', number: '1', description: 'Mobilization & Removals',
+        items: [
+          { line: '0010', code: '1031000', description: 'MOBILIZATION', qty: '1.000', unit: 'LS', unitPrice: '' },
+          { line: '0020', code: '1031200', description: 'BRIDGE CONSTRUCTION ACCESS', qty: '1.000', unit: 'LS', unitPrice: '' },
+          { line: '0030', code: '1032010', description: 'BONDS AND INSURANCE', qty: '1.000', unit: 'LS', unitPrice: '' },
+          { line: '0040', code: '2028200', description: 'REMOVAL & DISPOSAL OF EXISTING BRIDGE', qty: '1.000', unit: 'LS', unitPrice: '' },
+        ]
+      },
+      {
+        id: '2', number: '2', description: 'Bridge Construction',
+        items: [
+          { line: '0050', code: '2031000', description: 'UNCLASSIFIED EXCAVATION', qty: '171.600', unit: 'CY', unitPrice: '' },
+          { line: '0060', code: '2103000', description: 'FLOWABLE FILL', qty: '9.400', unit: 'CY', unitPrice: '' },
+          { line: '0070', code: '5033000', description: 'CONCRETE CLASS AA', qty: '120.000', unit: 'CY', unitPrice: '' },
+          { line: '0080', code: '5040100', description: 'REINFORCING STEEL', qty: '18500.000', unit: 'LB', unitPrice: '' },
+        ]
+      },
+    ])
+
+    // Re-run check automatically whenever any validation rule's dependencies change.
+    // No manual dependency list needed — validationRules is a computed that already
+    // tracks every reactive value it reads, so watchEffect picks them all up.
+    watchEffect(() => {
+      validationRules.value // access to register dependencies
+      if (checkResults.value) computeCheck()
+    })
+
+
+    watch(selectedBidder, (val) => {
+      if (bondVerified.value) {
+        bondVerified.value = false
+        bondRegistry.value = ''
+        bondId.value = ''
+      }
+      verifyAttempted.value = false
+      if (val) {
+        setErr('bond-id-input', false, '')
+        setErr('bond-registry-radio', false, '')
+      }
+    })
+
+    return {
+      pages, activePage, pageIndex, contextExpanded, alertBanner, bidSubmitted, mobileNavOpen,
+      checkResults, currentErrorIndex, allErrors, totalErrors, navItems,
+      selectedBidder, autoWithdraw, withdrawCallsMap, bondType, bondRegistry, bondId, bondVerified, verifyAttempted, verifyBond, resetBond, bidTotal, itemTotal, siteTotal, parseAmount, itemExtension, sectionTotal, formatAmt, onDaysChange, checkAttempted,
+      completionLabel, goTo, setPage, goToScheduleItem, goToVendor, assigneesForLine, overcommitMap, isLineOvercommitted, closeMobileNav,
+      print: () => {
+        // Close any open dropdown menus before printing so they don't appear in the preview
+        document.querySelectorAll('cw-dropdown-menu').forEach(el => el.close?.())
+        setTimeout(() => window.print(), 50)
+      },
+      submitView, submitAcknowledged, submitAcknowledgeAttempted, onAcknowledgeChange,
+      runCheck, computeCheck, openSubmitSlideout, closeSubmitSlideout, doSubmit, submitDone,
+      goPrevError, goNextError, navigateToError, openErrorsSlideout, closeErrorsSlideout, selectErrorAndClose, dismissCheck,
+      agencyAbbr, agencyName, bidderOptions, certOptions, bondTypeOptions, bondGoalPct, scheduleSections, siteItems, vendorGoals, vendorGoalActuals, vendorEligibleGoals, goalActualPct, goalTargetAmt, goalActualAmt, goalProgress, goalProgressValue, amendments, pageComplete,
+      openAmendmentsSlideout, printAmendments,
+      fileType, tempFileType, fieldSizes, tempFieldSizes, colFields, fieldSizesModified,
+      resetFieldSizes, openFileTypeSlideout, closeFileTypeSlideout, saveFileType,
+      openResetModal, closeResetModal, resetItems, vendorCertified,
+      newVendorCompany, vendorManualEntry, vendors, filteredVendors, hideUnused, vendorSort, certFilter, availableCertTypes, canAssignItems, selectedVendorTotal, vendorOptions, classificationOptions, workTypeOptions,
+      vendorManualBidderId, vendorManualAddress, vendorManualCity, vendorManualState, vendorManualCert,
+      vendorSaveAttempted,
+      vendorToEdit, vendorToRemove, pendingVendorName,
+      openAddVendorModal, closeAddVendorModal, resetAddVendorModal, saveVendor, removeVendor,
+      openChangeVendorModal, openRemoveVendorModal, closeRemoveVendorModal, confirmRemoveVendor,
+      cancelDuplicate, confirmAddDuplicate,
+      assignItemsVendor, assignItemsDraft, assignItemsHideUnassigned, assignItemsSectionsOpen,
+      openAssignItems, saveAssignItems, cancelAssignItems, toggleAssignDraft, sectionAssignedCount,
+      removeAssignedItem, toggleItemNote, vendorItemsTotal,
+    }
+  }
+})
+
+app.config.compilerOptions.isCustomElement = tag => tag.startsWith('cw-')
+app.mount('#app')
+</script>
+</body>
+</html>
+
+<!--
+CAUSEWAY COMPONENTS USED
+─────────────────────────
+cw-app-layout, cw-app-header, cw-app-sidebar, cw-app-menu, cw-app-menu-group, cw-app-menu-item,
+cw-badge, cw-button, cw-callout, cw-checkbox, cw-h-checkbox, cw-dropdown-menu, cw-dropdown-menu-group, cw-dropdown-menu-item,
+cw-field-group, cw-input, cw-progress, cw-select, cw-tag, cw-toggle,
+cw-icon-add, cw-icon-arrow-left, cw-icon-arrow-right, cw-icon-caret-circle-right, cw-icon-caret-down,
+cw-icon-check-circle-outline, cw-icon-check-verified, cw-icon-chevron-down, cw-icon-chevron-left, cw-icon-chevron-up, cw-icon-clear,
+cw-icon-attachment, cw-icon-document-outline, cw-icon-group, cw-icon-items, cw-icon-lightning,
+cw-icon-payment, cw-icon-print, cw-icon-sort-asc
+
+Causeway version: 1.93.0-alpha.2
+Bundle: https://bcdn.infotechinc.com/causeway/v1.93.0-alpha.2/all.umd.js
+-->

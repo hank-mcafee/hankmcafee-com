@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Electronic Bid Form — Hank McAfee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Aleo:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ───────────────────────────────────────── */
+    :root {
+      --navy:       #1a2535;
+      --navy-light: #243044;
+      --navy-muted: rgba(255,255,255,0.06);
+      --blue:       #2456A5;
+      --blue-light: #4595D7;
+      --orange:      #FA872E;
+      --orange-dark: #DC6A13;
+      --slate:      #f4f6f8;
+      --slate-mid:  #e2e8f0;
+      --white:      #ffffff;
+      --ink:        #1a2535;
+      --ink-mid:    #3d4f62;
+      --ink-muted:  #7a8fa3;
+      --ink-faint:  #b0bfcc;
+      --font-display: 'Aleo', Georgia, serif;
+      --font-body:    'Inter', system-ui, sans-serif;
+      --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--slate);
+    }
+
+    /* ── Sticky header ───────────────────────────────────────── */
+    .cs-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--navy);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+    }
+    .cs-header-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .cs-header-back:hover { color: var(--orange); }
+    .cs-header-logo a { display: block; line-height: 0; }
+    .cs-header-logo img { height: 28px; display: block; }
+
+    /* ── Reveal animation ─────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .cs-hero {
+      background: var(--navy);
+      padding: 5rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cs-hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(45,125,210,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cs-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 15%;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(250,135,46,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cs-hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .cs-hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1.25rem;
+    }
+    .cs-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 3.75rem);
+      line-height: 1.08;
+      color: var(--white);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+    .cs-hero h1 em {
+      font-style: italic;
+      color: var(--orange);
+    }
+    .cs-hero-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.72;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+    }
+    .cs-hero-meta {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 1.75rem;
+    }
+    .cs-meta-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.3rem;
+    }
+    .cs-meta-value {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.82);
+    }
+
+    /* ── Content column ───────────────────────────────────── */
+    .cs-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    /* ── Section labels & rule ────────────────────────────── */
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1.25rem;
+    }
+    .rule {
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange) 0%, var(--blue) 40%, transparent 100%);
+      border: none;
+      margin: 2rem 0;
+      border-radius: 2px;
+    }
+
+    /* ── Prose ─────────────────────────────────────────────── */
+    .cs-h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.15;
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+    }
+    .cs-h2 em { font-style: italic; color: var(--blue); }
+    .cs-p {
+      font-size: 0.97rem;
+      color: var(--ink-mid);
+      line-height: 1.82;
+      margin-bottom: 1.1rem;
+    }
+    .cs-p:last-child { margin-bottom: 0; }
+
+    /* ── Problem callout ─────────────────────────────────── */
+    .problem-callout {
+      background: #fef5ec;
+      border-left: 3px solid var(--orange);
+      border-radius: 0 6px 6px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.75rem 0;
+      font-size: 0.92rem;
+      color: var(--ink-mid);
+      line-height: 1.75;
+    }
+    .problem-callout strong { color: var(--ink); }
+
+    /* ── Decision cards ─────────────────────────────────────── */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .decision-card {
+      background: var(--white);
+      border: 1px solid var(--slate-mid);
+      border-radius: 10px;
+      padding: 1.75rem 2rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .decision-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--orange);
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      letter-spacing: 0.02em;
+    }
+    .decision-heading {
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 0.55rem;
+      line-height: 1.3;
+    }
+    .decision-text {
+      font-size: 0.88rem;
+      color: var(--ink-mid);
+      line-height: 1.8;
+    }
+
+    /* ── Prototype card ─────────────────────────────────────── */
+    .proto-card {
+      background: var(--navy-light);
+      border-radius: 10px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    .proto-card-text p {
+      font-size: 0.97rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+    }
+    @media (max-width: 680px) {
+      .proto-card { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ── Flow diagram ──────────────────────────────────────── */
+    .flow-diagram-wrap {
+      display: block;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--slate-mid);
+      text-decoration: none;
+      position: relative;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    a.flow-diagram-wrap:hover {
+      border-color: var(--blue-light);
+      box-shadow: 0 6px 24px rgba(26,37,53,0.1);
+    }
+    .diagram-img-wrap {
+      height: 240px;
+      background: var(--slate);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .diagram-img-wrap img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .flow-diagram-caption {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--white);
+      border-top: 1px solid var(--slate-mid);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.03em;
+    }
+    .flow-diagram-caption span {
+      color: var(--ink-muted);
+      font-weight: 400;
+      margin-left: auto;
+      font-size: 0.72rem;
+    }
+
+    /* ── Diagram placeholder body ────────────────────────── */
+    .diagram-placeholder-body {
+      height: 200px;
+      background: var(--slate);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .diagram-placeholder-body svg { opacity: 0.28; }
+    .diagram-placeholder-body p {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    div.flow-diagram-wrap .flow-diagram-caption { color: var(--ink-muted); }
+
+    /* ── Diagrams grid ───────────────────────────────────── */
+    .diagrams-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    /* ── Outcome callout ───────────────────────────────────── */
+    .outcome-callout {
+      background: var(--navy);
+      border-radius: 10px;
+      padding: 2.5rem;
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .outcome-stat-num {
+      font-family: var(--font-display);
+      font-size: 3.25rem;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .outcome-stat-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.65;
+    }
+
+    /* ── Buttons ───────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      transition: all 0.2s var(--ease);
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-light); transform: translateY(-1px); }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .cs-footer {
+      background: var(--navy);
+      padding: 2.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .cs-footer a {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.48);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .cs-footer a:hover { color: var(--orange); }
+    .cs-footer-copy {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 680px) {
+      .diagrams-grid { grid-template-columns: 1fr; }
+      .outcome-callout { grid-template-columns: 1fr; }
+      .decision-card { padding: 1.5rem; }
+      .cs-hero-meta { gap: 1.5rem; }
+      .cs-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="cs-header">
+    <a href="index.html#work" class="cs-header-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Portfolio
+    </a>
+    <div class="cs-header-logo">
+      <a href="index.html" aria-label="Hank McAfee — Portfolio">
+        <img src="hm-identity.svg" alt="Hank McAfee" height="28" />
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Hero ──────────────────────────────────────────────── -->
+  <section class="cs-hero">
+    <div class="cs-hero-inner">
+      <div class="cs-hero-eyebrow reveal">Case Study · Submission UX</div>
+      <h1 class="reveal reveal-delay-1">Electronic<br><em>Bid Form</em></h1>
+      <p class="cs-hero-desc reveal reveal-delay-2">A web-based replacement for a legacy Windows application used to submit electronic bids to state transportation agencies — redesigned around authorization clarity, real-time compliance tracking, and a validation-gated submission path.</p>
+      <div class="cs-hero-meta reveal reveal-delay-3">
+        <div class="cs-meta-item">
+          <div class="cs-meta-label">Role</div>
+          <div class="cs-meta-value">Lead Product Designer</div>
+        </div>
+        <div class="cs-meta-item">
+          <div class="cs-meta-label">Year</div>
+          <div class="cs-meta-value">2024</div>
+        </div>
+        <div class="cs-meta-item">
+          <div class="cs-meta-label">Scope</div>
+          <div class="cs-meta-value">UX Design · Prototype · Flow Documentation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Context ────────────────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Context</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">High-stakes, <em>time-sensitive</em></h2>
+      <p class="cs-p reveal reveal-delay-2">Submitting a bid to a state transportation agency is a high-stakes, time-sensitive action. Bids have hard deadlines, legal obligations, and compliance requirements — including federally mandated participation goals for Disadvantaged Business Enterprise (DBE) and Small Business Enterprise (SBE) subcontractors. A missed requirement or incomplete submission can disqualify a bid entirely.</p>
+      <p class="cs-p reveal reveal-delay-2">User personas range from experienced estimators at large general contractors to office managers at small firms submitting bids infrequently. For the latter especially, the process could be opaque, error-prone, and anxiety-inducing.</p>
+      <p class="cs-p reveal reveal-delay-3">The legacy system was installed Windows software — static layouts, no progressive disclosure, limited affordances, and significant accessibility gaps. Users frequently weren't sure if their vendor goals were on track, their form really had errors that applied to them, or if they had the proper authorization to submit until they tried to submit. The answer was usually a call to support.</p>
+    </div>
+  </div>
+
+  <!-- ── Problem ────────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">The Problem</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Three distinct but related<br><em>problems shaped the redesign</em></h2>
+
+      <div class="problem-callout reveal reveal-delay-2">
+        <strong>Authorization uncertainty.</strong> The legacy system gave users little visibility that they were eligible to bid. Support queues filled with calls from users who had completed a bid but weren't authorized to submit it.
+      </div>
+
+      <div class="problem-callout reveal reveal-delay-3">
+        <strong>Vendor goal tracking was manual and opaque.</strong> DBE and SBE participation goals are set per proposal by the agency, calculated as a percentage of the bid value. In the legacy system, goals were tracked but users had to do a lot of math on their own.
+      </div>
+
+      <div class="problem-callout reveal reveal-delay-4">
+        <strong>Form completion was ambiguous.</strong> The legacy system included per-section validation, but its static layout had no mechanism for expressing conditional requirements. A section might contain a required choice between options A or B or C. The form couldn't communicate the relationship between a choice and its downstream requirements, so users and support staff were left to bridge the gap.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Design Decisions ───────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Design Decisions</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Five decisions that<br><em>defined the experience</em></h2>
+
+      <div class="decisions-list">
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">01</div>
+          <div class="decision-body">
+            <div class="decision-heading">Knock knock</div>
+            <p class="decision-text">A verified signatory ID is required to submit a bid. Rather than waiting until submission to check for it, the form checks up front, which also encrypts the form for that user. Authorization status is visible and persistent. Users know if they are allowed to submit before they fill in a single field.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">02</div>
+          <div class="decision-body">
+            <div class="decision-heading">What do you need?</div>
+            <p class="decision-text">The legacy system's static layout had no mechanism for showing or hiding fields based on user choices. This created a specific problem: a form section might require a choice between options A or B or C, each with its own subform and instructions. If subforms are all required, there will be false errors. The redesign uses progressive disclosure to make conditionality visible. Everything you need. Nothing you don't.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">03</div>
+          <div class="decision-body">
+            <div class="decision-heading">We'll do it live</div>
+            <p class="decision-text">Participation goals for certified vendors (DBE, SBE, etc) are calculated in real time against the current item total. As vendors are added and line items are assigned, progress bars update immediately — showing dollar amounts, percentages, and whether each goal is on track. There's no math to do manually and no ambiguity about whether compliance is met.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">04</div>
+          <div class="decision-body">
+            <div class="decision-heading">Check it out</div>
+            <p class="decision-text">When a user wants to look for any errors (or automatically when a submit action takes place), a validation pass runs across the entire form. Errors are organized into a dismissible drawer for visibility, and also tallied in a persistent block with navigation that jumps directly to each problem.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">05</div>
+          <div class="decision-body">
+            <div class="decision-heading">One and the same</div>
+            <p class="decision-text">Each agency's existing form configuration — federal forms, bond goals, vendor goal percentages, item assignment rules, legal language — were migrated and redesigned to take full advantage of the new system while maintaining exact legal parity with the legacy forms. The template architecture allows per-agency configuration without forking the codebase, and the redesign process treated each agency's requirements as an opportunity to reconsider how and when they were presented.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Prototype ───────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Prototype</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Try the <em>live prototype</em></h2>
+      <p class="cs-p reveal reveal-delay-2">The prototype covers the full bid form experience — authorization status, progressive disclosure of conditional sections, live vendor goal tracking with real-time progress bars, and the Run Check validation flow with a slideout error panel. Built with Vue 3, the Causeway component library, and Tailwind CSS.</p>
+      <div class="proto-card reveal reveal-delay-3">
+        <div class="proto-card-text">
+          <p>Explore the authorization identity bar, add vendors to see goal tracking update in real time, and use Run Check to surface validation errors before the submit path opens.</p>
+        </div>
+        <a href="portfolio/bid-form-shell.html" target="_blank" rel="noopener" class="btn btn-primary">
+          Open prototype →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Flow Diagrams ──────────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Flow Diagrams</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Submission flow &amp; <em>goal tracking logic</em></h2>
+      <p class="cs-p reveal reveal-delay-2">Two FigJam diagrams document the full submission flow and the vendor goal attribution logic — including how the system resolves vendors with multiple certification types against per-proposal goal configurations.</p>
+
+      <div class="diagrams-grid reveal reveal-delay-3">
+
+        <a href="https://www.figma.com/board/hsSrReuEuvzuuWX1skTUZY/Bid-Form--Full-Submission-Flow?t=eOyFtFB06J83Sh56-6" target="_blank" rel="noopener" class="flow-diagram-wrap">
+          <div class="diagram-img-wrap">
+            <img src="img-figjam-ebf-flow.png" alt="Bid Form — Full Submission Flow diagram" />
+          </div>
+          <div class="flow-diagram-caption">
+            Open in FigJam →
+            <span>Full submission flow</span>
+          </div>
+        </a>
+
+        <a href="https://www.figma.com/board/3sJsZGiHKZFePjAhGXXYNw/Bid-Form--Vendor-Goal-Tracking-Logic?t=eOyFtFB06J83Sh56-6" target="_blank" rel="noopener" class="flow-diagram-wrap">
+          <div class="diagram-img-wrap">
+            <img src="img-figjam-ebf-goals.png" alt="Bid Form — Vendor Goal Tracking Logic diagram" />
+          </div>
+          <div class="flow-diagram-caption">
+            Open in FigJam →
+            <span>Vendor goal tracking logic</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Outcome ─────────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Outcome</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Measurable reduction in<br><em>support volume</em></h2>
+      <div class="outcome-callout reveal reveal-delay-2">
+        <div>
+          <div class="outcome-stat-num">3</div>
+          <div class="outcome-stat-label">Top support drivers — authorization confusion, vendor goal uncertainty, and incomplete submission errors — each directly addressed by the new UX</div>
+        </div>
+        <div>
+          <div class="outcome-stat-num">↓</div>
+          <div class="outcome-stat-label">Agency onboarding shifted from a custom development effort to a configuration and content exercise — a structural change in how the platform scales</div>
+        </div>
+      </div>
+
+      <p class="cs-p reveal" style="margin-top: 2rem;">Users now have continuous feedback on their authorization status, real-time visibility into compliance goals, and a validation-gated submission path that surfaces problems before they become rejections. The three most common support drivers were each directly addressed by the new UX.</p>
+      <p class="cs-p reveal">The agency template system also reduced the overhead of migrating agencies, turning what had previously been a custom development effort into a configuration and content exercise.</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="cs-footer">
+    <a href="index.html">← Back to Portfolio</a>
+    <span class="cs-footer-copy">Hank McAfee · Product Design</span>
+    <a href="mailto:hmcafee@me.com">hmcafee@me.com</a>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => revealObs.observe(el));
+  </script>
+
+</body>
+</html>

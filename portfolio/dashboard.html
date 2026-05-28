@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Bid Express</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://assets.infotechinc.com/causeway-sdk/v1.92.0/tailwind-preset.umd.js"></script>
+  <script>tailwind.config = { presets: [CausewayTailwindPreset] }</script>
+  <script src="https://bcdn.infotechinc.com/causeway/v1.92.0/all.umd.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- Required: replicates preset-app base styles absent from CDN tailwind-preset.umd.js -->
+  <style type="text/tailwindcss">
+    @layer base {
+      html, body { @apply min-h-full h-full; }
+      body { background-color: #F3F6F8; color: #2C3D4F; -webkit-font-smoothing: antialiased; }
+      small { @apply text-sm; }
+      h1, h2, h3, h4, h5, h6 { @apply leading-tight; }
+      h1 { font-size: 2em; }
+      h2 { font-size: 1.5em; }
+      h3 { font-size: 1.25em; }
+    }
+  </style>
+  <style>
+    /* ── Recommended carousel ─────────────────────────────────────── */
+    .rec-carousel {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 16px;
+      margin: -16px;
+    }
+    .rec-carousel::-webkit-scrollbar { display: none; }
+    .rec-card { flex: 0 0 320px; }
+    .rec-card-inner {
+      background: white;
+      border-radius: 4px;
+      transition: box-shadow 150ms ease;
+    }
+    .rec-card-inner:hover {
+      box-shadow: 0px 10px 15px -3px rgba(0,0,0,0.1), 0px 4px 6px -2px rgba(0,0,0,0.05);
+    }
+
+    /* ── Followed list ────────────────────────────────────────────── */
+    .followed-row {
+      background: white;
+      border: 1px solid #E1E9EF; /* specter-400 */
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0px 1px 2px 0px rgba(44, 61, 79, 0.08), 0px 2px 4px 0px rgba(44, 61, 79, 0.06);
+    }
+
+    /* ── Dashboard two-column layout ──────────────────────────────── */
+    .dashboard-cols {
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .dashboard-main { flex: 1; min-width: 0; }
+    .dashboard-cal {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+      flex: 1 0 0;
+      min-width: 240px;
+      max-width: 360px;
+    }
+    @media (max-width: 860px) {
+      .dashboard-cols { flex-direction: column; }
+      .dashboard-cal  { max-width: 100%; width: 100%; }
+    }
+
+/* ── Description truncation ───────────────────────────────────── */
+    .desc-text {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <cw-bidx-app-layout
+    user-name="Hank McAfee"
+    user-email="hank.mcafee@njdot.gov"
+    business-name="New Jersey Department of Transportation"
+    agency-name="New Jersey Department of Transportation">
+
+    <!-- ── Favorite agencies ──────────────────────────────────────── -->
+    <cw-bidx-agency-picker-favorites slot="favorite-agencies" user-name="Hank McAfee">
+      <cw-button appearance="outlined" content="NJDOT" href="#"></cw-button>
+      <cw-button appearance="outlined" content="NYSDOT" href="#"></cw-button>
+    </cw-bidx-agency-picker-favorites>
+
+    <!-- ── Agency list ────────────────────────────────────────────── -->
+    <cw-bidx-agency-picker-item slot="agencies" content="New Jersey Department of Transportation" agency-id="NJDOT" current favorite></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="New York State Department of Transportation" agency-id="NYSDOT" favorite></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="Florida Department of Transportation" agency-id="FDOT"></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="Georgia Department of Transportation" agency-id="GADOT"></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="Ohio Department of Transportation" agency-id="ODOT"></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="Wisconsin Department of Transportation" agency-id="WIDOT"></cw-bidx-agency-picker-item>
+    <cw-bidx-agency-picker-item slot="agencies" content="Iowa Department of Transportation" agency-id="IADOT"></cw-bidx-agency-picker-item>
+
+    <!-- ── Header left ────────────────────────────────────────────── -->
+    <cw-button slot="header-left" href="#" size="sm" theme="secondary" appearance="ghost" content="Getting started">
+      <cw-icon-flag-outline slot="icon-left"></cw-icon-flag-outline>
+    </cw-button>
+
+    <!-- ── Tools dropdown items ───────────────────────────────────── -->
+    <cw-dropdown-menu-item slot="tools" content="Information console" href="#"></cw-dropdown-menu-item>
+    <cw-dropdown-menu-item slot="tools" content="Support console" href="#"></cw-dropdown-menu-item>
+    <cw-dropdown-menu-item slot="tools" content="System admin console" href="#"></cw-dropdown-menu-item>
+
+    <!-- ── Notifications ──────────────────────────────────────────── -->
+    <cw-dropdown-menu-item slot="notifications" content="Notifications" href="#"></cw-dropdown-menu-item>
+
+    <!-- ── Help dropdown items ────────────────────────────────────── -->
+    <cw-dropdown-menu-group slot="help">
+      <cw-dropdown-menu-item content="Knowledge base" href="https://infotechinc.zendesk.com/hc/en-us/categories/1500000089341-Bidx-com-at-www-bidx-com" target="_blank">
+        <cw-icon-open-in-new slot="add-on-right"></cw-icon-open-in-new>
+      </cw-dropdown-menu-item>
+    </cw-dropdown-menu-group>
+    <cw-dropdown-menu-item slot="help" content="Send feedback…"></cw-dropdown-menu-item>
+
+    <!-- ── User menu actions ──────────────────────────────────────── -->
+    <cw-button slot="user-menu-actions" size="sm" theme="secondary" appearance="outlined" content="Settings" href="#"></cw-button>
+    <cw-button slot="user-menu-actions" size="sm" theme="secondary" content="Sign out"></cw-button>
+
+    <!-- ── Sidebar nav ────────────────────────────────────────────── -->
+    <cw-app-menu-item slot="menu" content="Workspace" href="#" current>
+      <cw-icon-view-dashboard></cw-icon-view-dashboard>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Home" href="#">
+      <cw-icon-federal></cw-icon-federal>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Lettings" href="#">
+      <cw-icon-calendar></cw-icon-calendar>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Item search" href="#">
+      <cw-icon-magnify></cw-icon-magnify>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Competitor Insights" href="#">
+      <cw-icon-line-chart></cw-icon-line-chart>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Bid Tab Analysis" href="#">
+      <cw-icon-analytics-alt></cw-icon-analytics-alt>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Small Business Network" href="#">
+      <cw-icon-group></cw-icon-group>
+    </cw-app-menu-item>
+    <cw-app-menu-item slot="menu-agency" content="Agency Admin" href="#">
+      <cw-icon-admin></cw-icon-admin>
+    </cw-app-menu-item>
+
+    <!-- ── Footer links ───────────────────────────────────────────── -->
+    <a slot="footer-links" href="https://www.infotechinc.com/legal-notices" target="_blank">Legal</a>
+    <a slot="footer-links" href="https://releases.infotechinc.com/#all+Bidx.com+all" target="_blank">Releases</a>
+    <a slot="footer-links" href="https://www.infotechinc.com/contact" target="_blank">Support</a>
+    <a slot="footer-links" href="#" target="_blank">Knowledge Center</a>
+
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <!-- Main content                                                  -->
+    <!-- ════════════════════════════════════════════════════════════ -->
+    <div class="p-6">
+
+      <h1 class="text-3xl font-bold text-primary mb-5 leading-none">Hank's Workspace</h1>
+
+      <!-- Tabs -->
+      <cw-tabs label="Workspace navigation" class="mb-6">
+        <cw-tab
+          content="Dashboard"
+          :current.prop="activeTab === 'dashboard'"
+          @click="activeTab = 'dashboard'">
+        </cw-tab>
+        <cw-tab
+          content="Favorites"
+          :current.prop="activeTab === 'favorites'"
+          @click="activeTab = 'favorites'">
+        </cw-tab>
+        <cw-tab
+          content="Tips"
+          :current.prop="activeTab === 'tips'"
+          @click="activeTab = 'tips'">
+        </cw-tab>
+      </cw-tabs>
+
+      <!-- ── Dashboard panel ──────────────────────────────────────── -->
+      <div v-show="activeTab === 'dashboard'">
+
+        <!-- Recommended section -->
+        <div class="rounded-lg p-4 mb-6" style="background:#EFEBF0">
+
+          <!-- Section header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-semibold" style="color:#3D2240">Recommended</span>
+              <cw-icon-sparkles style="color:#3D2240;width:16px;height:16px;flex-shrink:0"></cw-icon-sparkles>
+              <cw-badge content="96"></cw-badge>
+              <cw-button theme="secondary" appearance="outlined" size="sm" content="View all" href="#"></cw-button>
+            </div>
+            <a href="#" class="text-xs font-medium" style="color:#004BD9">Notifications: Off</a>
+          </div>
+
+          <!-- Card carousel -->
+          <div class="rec-carousel" ref="carouselEl">
+            <div v-for="(card, i) in recommendedCards" :key="i" class="rec-card">
+              <div class="p-4 h-full rec-card-inner cursor-pointer" :class="{ 'rec-card-ai': card.aiRec }" @click="openCard(card)">
+                <div class="flex gap-6 items-start">
+                  <!-- Identifiers -->
+                  <div class="flex-1 min-w-0 flex flex-col gap-2">
+                    <div class="flex flex-wrap items-start whitespace-nowrap" style="gap:4px 16px;font-size:12px;line-height:16px;color:#2C3D4F">
+                      <span class="flex-shrink-0" style="min-width:88px">{{ card.date }}</span>
+                      <span class="flex-shrink-0">{{ card.agency }}</span>
+                    </div>
+                    <div class="flex flex-wrap items-start" style="gap:0 16px">
+                      <span class="font-medium flex-shrink-0 text-sm" style="color:#2C3D4F">{{ card.callNumber }}</span>
+                      <span class="font-semibold flex-shrink-0 text-sm" style="color:#2C3D4F">{{ card.itemCode }}</span>
+                    </div>
+                    <p class="text-sm font-medium overflow-hidden text-ellipsis whitespace-nowrap" style="color:#566372">{{ card.location }}</p>
+                    <div>
+                      <cw-tag v-if="card.aiRec" content="Bid Intelligence" size="sm" theme="sunset">
+                        <cw-icon-sparkles slot="icon"></cw-icon-sparkles>
+                      </cw-tag>
+                      <cw-tag v-else :content="`${card.favorites} favorites`" size="sm" theme="amethyst"></cw-tag>
+                    </div>
+                  </div>
+                  <!-- Actions -->
+                  <div class="flex items-center gap-1 flex-shrink-0">
+                    <cw-icon-bookmark-outline style="width:24px;height:24px;color:#AAB1B8;flex-shrink:0"></cw-icon-bookmark-outline>
+                    <cw-button theme="secondary" appearance="ghost" size="md" aria-label="Dismiss">
+                      <cw-icon-clear slot="icon"></cw-icon-clear>
+                    </cw-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /Recommended -->
+
+        <!-- Two-column: followed list + calendar -->
+        <div class="dashboard-cols">
+
+          <!-- Followed list -->
+          <div class="dashboard-main">
+
+            <div class="flex flex-col gap-3 mb-3">
+
+              <!-- Title row -->
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-primary whitespace-nowrap">Saved</span>
+                <cw-icon-bookmark style="width:16px;height:16px;flex-shrink:0"></cw-icon-bookmark>
+                <cw-badge :content="String(sortedFollowedItems.length)" theme="white"></cw-badge>
+              </div>
+
+              <!-- Sort and filter row -->
+              <div class="flex items-center w-full gap-4">
+
+                <!-- Sort controls -->
+                <div class="flex items-center flex-shrink-0" style="gap:24px">
+
+                  <!-- Sort criteria select -->
+                  <div class="flex items-center gap-2 whitespace-nowrap">
+                    <span class="text-xs text-secondary">Sort by:</span>
+                    <cw-select
+                      appearance="ghost"
+                      size="sm"
+                      value="recent"
+                      :value.prop="sortCriteria"
+                      @change="sortCriteria = $event.target.value">
+                      <cw-select-option value="recent" content="Recent activity"></cw-select-option>
+                      <cw-select-option value="agency" content="Agency"></cw-select-option>
+                      <cw-select-option value="letting-date" content="Letting date"></cw-select-option>
+                    </cw-select>
+                  </div>
+
+                  <!-- Direction toggle -->
+                  <button
+                    class="flex items-center gap-1 cursor-pointer bg-transparent border-0 p-0 whitespace-nowrap"
+                    @click="sortAscending = !sortAscending">
+                    <cw-icon-sort-asc v-if="sortAscending" style="width:16px;height:16px;flex-shrink:0"></cw-icon-sort-asc>
+                    <cw-icon-sort-desc v-else style="width:16px;height:16px;flex-shrink:0"></cw-icon-sort-desc>
+                    <span class="text-xs font-medium text-secondary">A-Z</span>
+                  </button>
+
+                </div>
+
+                <!-- Bid status filter — pushed to far right -->
+                <div style="margin-left:auto;flex-shrink:0">
+                  <cw-select appearance="ghost" size="sm" value="" :value.prop="filterStatus" options-width="sm" @change="filterStatus = $event.target.value">
+                    <cw-select-group>
+                      <cw-select-option value="" content="Any bid status"></cw-select-option>
+                    </cw-select-group>
+                    <cw-select-group>
+                      <cw-select-option value="Draft" content="Draft" :caption="String(statusCounts.Draft)"></cw-select-option>
+                      <cw-select-option value="Submitted" content="Submitted" :caption="String(statusCounts.Submitted)"></cw-select-option>
+                      <cw-select-option value="Replacement" content="Replacement" :caption="String(statusCounts.Replacement)"></cw-select-option>
+                      <cw-select-option value="Invalid" content="Invalid" :caption="String(statusCounts.Invalid)"></cw-select-option>
+                    </cw-select-group>
+                  </cw-select>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <div v-for="(item, idx) in sortedFollowedItems" :key="item.itemCode" class="followed-row">
+
+                <!-- Identifiers + actions -->
+                <div class="flex gap-6 items-start w-full mb-2">
+
+                  <!-- Main: stacked rows -->
+                  <div class="flex flex-1 flex-col gap-2 items-start min-w-0">
+
+                    <!-- Row 1: Letting date + agency -->
+                    <div class="flex flex-wrap items-start w-full whitespace-nowrap" style="gap:4px 16px;min-width:168px;font-size:12px;line-height:16px;color:#2C3D4F">
+                      <span class="flex-shrink-0" style="min-width:88px">{{ item.date }}</span>
+                      <span class="flex-shrink-0">{{ item.agency }}</span>
+                    </div>
+
+                    <!-- Row 2: Call/Proposal/Location + Status -->
+                    <div class="flex flex-wrap items-start w-full" style="gap:8px;min-width:168px">
+                      <!-- Call, Proposal, Location -->
+                      <div class="flex flex-1 flex-wrap items-start leading-5 text-sm whitespace-nowrap" style="gap:4px 16px;min-width:168px">
+                        <!-- Call + Proposal -->
+                        <div class="flex flex-wrap items-start flex-shrink-0" style="gap:0 16px;max-width:240px;min-width:168px">
+                          <span class="font-medium flex-shrink-0" style="color:#2C3D4F">{{ item.callNumber }}</span>
+                          <a href="#" class="font-semibold flex-shrink-0" style="color:#004BD9">{{ item.itemCode }}</a>
+                        </div>
+                        <!-- Location: truncated -->
+                        <p class="font-medium overflow-hidden text-ellipsis" style="flex:1 0 0;min-width:120px;color:#566372">{{ item.location }}</p>
+                      </div>
+                      <!-- Status -->
+                      <div v-if="item.status" class="flex flex-col items-start flex-shrink-0" style="padding:2px 0">
+                        <div :class="['flex items-center', item.status === 'Submitted' ? 'gap-2' : item.status === 'Invalid' ? 'gap-1' : '']">
+                          <cw-icon-automatic v-if="item.status === 'Submitted' && item.autoWithdraw" style="width:16px;height:16px;flex-shrink:0;color:#566372"></cw-icon-automatic>
+                          <cw-icon-alert-outline v-if="item.status === 'Submitted' && item.withErrors" style="width:16px;height:16px;flex-shrink:0;color:#566372"></cw-icon-alert-outline>
+                          <cw-icon-alert v-if="item.status === 'Invalid'" style="width:16px;height:16px;flex-shrink:0;color:#FAB60D"></cw-icon-alert>
+                          <cw-tag :content="item.status" size="sm" :theme="item.status === 'Draft' ? 'midnight' : item.status === 'Submitted' ? 'emerald' : 'amber'"></cw-tag>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Row 3: Project metadata -->
+                    <div v-if="item.projectId || item.hwy || item.amendments" class="flex flex-wrap items-start w-full" style="gap:4px 16px;min-width:168px">
+                      <span v-if="item.projectId" class="flex-shrink-0 whitespace-nowrap" style="font-size:12px;line-height:16px;color:#566372">Project ID: {{ item.projectId }}</span>
+                      <span v-if="item.hwy" class="flex-shrink-0 whitespace-nowrap" style="font-size:12px;line-height:16px;color:#566372">Hwy: {{ item.hwy }}</span>
+                      <span v-if="item.amendments" class="flex-shrink-0 whitespace-nowrap" style="font-size:12px;line-height:16px;color:#566372">Amendments: {{ item.amendments }}</span>
+                    </div>
+
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex gap-1 items-center flex-shrink-0">
+                    <cw-icon-bookmark style="width:24px;height:24px;flex-shrink:0" class="text-amethyst cursor-pointer"></cw-icon-bookmark>
+                    <cw-button theme="secondary" appearance="ghost" size="md" :id="`row-menu-${idx}`" aria-label="More options">
+                      <cw-icon-more-vert slot="icon"></cw-icon-more-vert>
+                    </cw-button>
+                  </div>
+
+                </div>
+
+                <!-- Description -->
+                <p class="text-sm text-secondary desc-text">{{ item.description }}</p>
+                <a href="#" class="text-xs font-medium" style="color:#004BD9" v-if="item.description.length > 140">more</a>
+
+              </div>
+            </div>
+
+          </div>
+          <!-- /Followed list -->
+
+          <!-- Ending soon column -->
+          <div class="dashboard-cal">
+
+            <!-- Section title -->
+            <div class="flex flex-col gap-3 w-full">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-primary whitespace-nowrap">Ending soon</span>
+                <cw-icon-time style="width:16px;height:16px;flex-shrink:0"></cw-icon-time>
+                <cw-badge :content="String(endingSoonItems.length)"></cw-badge>
+              </div>
+              <p class="text-xs text-primary">Upcoming lettings from your favorite agencies</p>
+            </div>
+
+            <!-- Segmented day-range filter -->
+            <cw-segmented-switches
+              value="7"
+              :value.prop="activePeriod"
+              label="Time range"
+              style="width:100%"
+              @change="activePeriod = $event.detail">
+              <cw-segmented-switch content="7 days"  value="7"></cw-segmented-switch>
+              <cw-segmented-switch content="30 days" value="30"></cw-segmented-switch>
+              <cw-segmented-switch content="90 days" value="90"></cw-segmented-switch>
+            </cw-segmented-switches>
+
+            <!-- Letting list -->
+            <div class="flex flex-col gap-2 w-full pr-3">
+              <div
+                v-for="item in endingSoonItems"
+                :key="item.id"
+                class="flex gap-1 items-start pl-3 text-xs">
+                <span class="text-primary whitespace-nowrap">Letting of</span>
+                <a href="#" class="flex-1 font-medium min-w-0" style="color:#004BD9">{{ item.date }}</a>
+                <span class="text-primary whitespace-nowrap">{{ item.agency }}</span>
+              </div>
+            </div>
+
+          </div>
+          <!-- /Calendar column -->
+
+        </div>
+        <!-- /Two-column -->
+
+      </div>
+      <!-- /Dashboard panel -->
+
+      <!-- ── Favorites panel ──────────────────────────────────────── -->
+      <div v-show="activeTab === 'favorites'">
+        <cw-empty-state type="text" content="Your favorited lettings will appear here.">
+          <cw-button slot="actions" theme="secondary" appearance="outlined" content="Browse lettings" href="#"></cw-button>
+        </cw-empty-state>
+      </div>
+
+      <!-- ── Tips panel ───────────────────────────────────────────── -->
+      <div v-show="activeTab === 'tips'">
+        <cw-empty-state type="text" content="Tips and helpful guidance will appear here as you use Bid Express."></cw-empty-state>
+      </div>
+
+    </div>
+    <!-- /Main content -->
+
+  </cw-bidx-app-layout>
+
+  <!-- ── Rec card detail modal ── -->
+  <div v-if="selectedCard" @click="closeCard()" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6)">
+    <div @click.stop style="width:520px;background:white;border:1px solid #DBE4EB;border-radius:4px;box-shadow:0px 20px 25px -5px rgba(0,0,0,0.1),0px 10px 10px -5px rgba(0,0,0,0.04);position:relative;overflow:hidden">
+
+      <!-- Close button -->
+      <button @click="closeCard()" style="position:absolute;top:7px;right:7px;padding:8px;background:none;border:none;cursor:pointer;display:flex">
+        <cw-icon-clear style="width:24px;height:24px"></cw-icon-clear>
+      </button>
+
+      <!-- Body -->
+      <div style="display:flex;flex-direction:column;gap:16px;max-height:520px;overflow-y:auto;padding:16px 24px 24px">
+
+        <!-- Proposal details -->
+        <div style="display:flex;flex-direction:column;gap:8px">
+
+          <!-- Agency + call/proposal + location -->
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <p style="font-size:14px;line-height:20px;font-weight:500;color:#566372">{{ selectedCard.agencyFull }}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:0 16px;align-items:baseline">
+              <span style="font-size:20px;line-height:28px;font-weight:600;color:#2C3D4F;white-space:nowrap">{{ selectedCard.callNumber }}</span>
+              <span style="font-size:20px;line-height:28px;font-weight:600;color:#2C3D4F;white-space:nowrap">{{ selectedCard.itemCode }}</span>
+            </div>
+            <p style="font-size:14px;line-height:20px;font-weight:500;color:#566372">{{ selectedCard.location }}</p>
+          </div>
+
+          <!-- Info row -->
+          <div style="display:flex;flex-wrap:wrap;gap:4px 24px;font-size:12px;line-height:16px;color:#566372">
+            <span style="white-space:nowrap">Letting: {{ selectedCard.date }}</span>
+          </div>
+
+          <!-- Description -->
+          <p style="font-size:12px;line-height:16px;color:#566372">{{ selectedCard.description }}</p>
+
+          <!-- AI tag array -->
+          <div v-if="selectedCard.aiRec" style="display:flex;align-items:flex-end;padding:4px 0;gap:8px">
+            <div style="flex:1 0 0;display:flex;flex-wrap:wrap;gap:8px;max-height:40px;overflow:hidden;min-width:0">
+              <cw-tag v-for="tag in selectedCard.tags" :key="tag" :content="tag" size="sm" theme="amethyst"></cw-tag>
+            </div>
+            <button v-if="selectedCard.tags.length > 4" style="font-size:12px;line-height:16px;color:#003CAE;white-space:nowrap;background:none;border:none;cursor:pointer;padding:0;flex-shrink:0">
+              +{{ selectedCard.tags.length - 4 }} tags
+            </button>
+          </div>
+
+        </div>
+
+        <!-- AI Rationale -->
+        <div v-if="selectedCard.aiRec" style="padding:16px;border-radius:8px;background:linear-gradient(157.86deg,#FEF4E8 0%,#FFF0F0 25%,#F2EAF5 60%,#E5F1FD 95%)">
+          <button @click="rationaleExpanded = !rationaleExpanded" style="display:flex;gap:4px;align-items:flex-start;width:100%;background:none;border:none;cursor:pointer;padding:0;text-align:left">
+            <!-- Sparkle + text -->
+            <div style="display:flex;flex:1 0 0;gap:8px;align-items:flex-start;align-self:stretch;min-width:0">
+              <cw-icon-sparkles class="cw-icon-sparkles text-gradient-sunset-500" style="width:20px;height:20px;flex-shrink:0;display:block;align-self:flex-start"></cw-icon-sparkles>
+              <div style="flex:1 0 0;min-width:0;overflow:hidden;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+                <p style="font-size:14px;line-height:20px;font-weight:500;color:#3D2240;width:100%;text-align:left"
+                   :style="rationaleExpanded ? {whiteSpace:'normal'} : {overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}">{{ selectedCard.rationale }}</p>
+              </div>
+            </div>
+            <!-- Chevron -->
+            <cw-icon-chevron-up v-if="rationaleExpanded" style="width:20px;height:20px;flex-shrink:0;display:block;align-self:flex-start;color:#3D2240"></cw-icon-chevron-up>
+            <cw-icon-chevron-down v-else style="width:20px;height:20px;flex-shrink:0;display:block;align-self:flex-start;color:#3D2240"></cw-icon-chevron-down>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <cw-dialog-footer layout="fill">
+        <cw-button slot="actions" theme="primary" appearance="ghost" size="md">
+          View full proposal
+          <cw-icon-open-in-new slot="icon-right"></cw-icon-open-in-new>
+        </cw-button>
+        <cw-button slot="actions" theme="primary" appearance="ghost" size="md">
+          Save
+          <cw-icon-bookmark slot="icon-right"></cw-icon-bookmark>
+        </cw-button>
+      </cw-dialog-footer>
+
+    </div>
+  </div>
+
+  <!-- ── Row context menus — must live outside cw-bidx-app-layout ── -->
+  <template v-for="(item, idx) in followedItems" :key="idx">
+    <cw-dropdown-menu :for="`row-menu-${idx}`" strategy="fixed">
+      <cw-dropdown-menu-item :content="`View ${item.callNumber}`" href="#"></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Unfollow" theme="destructive"></cw-dropdown-menu-item>
+      <cw-dropdown-menu-item content="Copy link"></cw-dropdown-menu-item>
+    </cw-dropdown-menu>
+  </template>
+
+</div><!-- /#app -->
+
+<script>
+const { createApp: _ca, ref: _ref, computed: _computed } = Vue
+const _app = _ca({
+  setup() {
+    const activeTab = _ref('dashboard')
+    const carouselEl = _ref(null)
+    const recommendedCards = _ref([
+      { date: 'May 20, 2026', agency: 'FDOT',   agencyFull: 'Florida Department of Transportation',       callNumber: 'Call 004', itemCode: 'T2A47',          location: 'DUVAL',                    favorites: 2,  aiRec: false, description: 'Resurfacing and milling on State Road 9A in Duval County. Contract Days: 180. Posting Dates: 04/07/2026 and 04/21/2026. Work includes pavement marking restoration and drainage inlet repairs.', tags: [], rationale: '' },
+      { date: 'Apr 21, 2026', agency: 'IADOT',  agencyFull: 'Iowa Department of Transportation',          callNumber: 'Call 007', itemCode: '92-C092-057',    location: 'BUCHANAN, CEDAR, HAMILTON', favorites: 16, aiRec: true,  description: 'Bridge rehabilitation and deck overlay on US-30 across three counties. Contract Days: 240. Work includes structural repairs, drainage improvements, and pavement marking restoration.', tags: ['Bridge', 'Rehabilitation', 'Roadway', 'Drainage', 'Resurfacing', 'Signs and Markings'], rationale: 'Bid Intelligence recommendation: Based on your bidding history on Iowa bridge rehabilitation contracts and recent activity in Buchanan County, this proposal aligns with your typical project profile and competitive win rate.' },
+      { date: 'May 22, 2026', agency: 'FDOT',   agencyFull: 'Florida Department of Transportation',       callNumber: 'Call 003', itemCode: 'E8W65',          location: 'PALM BEACH',               favorites: 5,  aiRec: false, description: 'Milling, resurfacing, and pavement marking on SR 80 in Palm Beach County. Contract Days: 120. Posting Dates: 04/14/2026 and 04/28/2026.', tags: [], rationale: '' },
+      { date: 'May 15, 2026', agency: 'GADOT',  agencyFull: 'Georgia Department of Transportation',       callNumber: 'Call 001', itemCode: 'B1CBA2601373',   location: 'Clarke',                   favorites: 5,  aiRec: true,  description: 'Widening and reconstruction of SR 10 in Clarke County including retaining wall construction, ADA ramp upgrades, and signal improvements. Contract Days: 365.', tags: ['Widening', 'Reconstruction', 'Roadway', 'Signal', 'Sidewalk and Trail', 'Structure'], rationale: 'Bid Intelligence recommendation: Your firm has submitted competitive bids on three similar GADOT widening contracts in the past 18 months. Signal and retaining wall scope aligns with your subcontractor network in the Athens metro area.' },
+      { date: 'Mar 5, 2026',  agency: 'NYSDOT', agencyFull: 'New York State Department of Transportation', callNumber: 'Call 693', itemCode: 'D265693',        location: 'PUTNAM',                   favorites: 3,  aiRec: false, description: 'Bridge replacements — Ramp G of I-84 over Interstates 84 and 684, Town of Southeast, Putnam County. Contract Days: 480.', tags: [], rationale: '' },
+      { date: 'Jun 12, 2026', agency: 'NJDOT',  agencyFull: 'New Jersey Department of Transportation',    callNumber: 'Call 026', itemCode: 'NJ2026-0612A',   location: 'BERGEN, ESSEX',            favorites: 8,  aiRec: true,  description: 'Drainage improvements, roadway resurfacing, and guiderail replacement along Route 46 corridor in Bergen and Essex Counties. Contract Days: 210. Includes nighttime work restrictions.', tags: ['Drainage', 'Resurfacing', 'Roadway', 'Barriers and Guardrail', 'Signs and Markings', 'Maintenance'], rationale: 'Bid Intelligence recommendation: This proposal closely matches your active contracts in New Jersey. Your pricing on recent NJDOT drainage and resurfacing work places you in a strong competitive position for Route 46 corridor projects.' },
+    ])
+    const followedItems = _ref([
+      { date: 'Feb 20, 2025', agency: 'FDOT',   callNumber: 'Call 002', itemCode: 'E1W93',          location: 'SARASOTA',                 projectId: 'N/A',      hwy: '1702', amendments: null, status: 'Submitted',   autoWithdraw: true,  withErrors: false, description: 'LETTING LOCATION: POSTING DATES: 03/11/2025 and 03/25/2025 CONTRACT DAYS: 250 CONTRACT EXECUTION DAYS: 10 The improvements under this Contract consist of milling and resurfacing on State Road 72.' },
+      { date: 'Feb 20, 2025', agency: 'FDOT',   callNumber: 'Call 003', itemCode: 'E1W94',          location: 'POLK',                     projectId: 'N/A',      hwy: '1609', amendments: 1,    status: 'Invalid',     autoWithdraw: false, withErrors: false, description: 'LETTING LOCATION: POSTING DATES: 03/11/2025 and 03/25/2025 CONTRACT DAYS: 80 The improvements under this Contract consist of Milling and Resurfacing, Pavement Marking, and related work.' },
+      { date: 'Feb 20, 2025', agency: 'FDOT',   callNumber: 'Call 005', itemCode: 'E1X63-R0',       location: 'DESOTO GLADES HARDEE HENDRY', projectId: 'N/A',   hwy: null,   amendments: null, status: 'Draft',       autoWithdraw: false, withErrors: false, description: 'LETTING LOCATION: POSTING DATES: 03/11/2025 and 03/25/2025 CONTRACT DAYS: 365 The work consists of Asphalt Milling and Resurfacing on various state roads.' },
+      { date: 'Feb 27, 2025', agency: 'FDOT',   callNumber: 'Call 001', itemCode: 'E6P15',          location: 'MIAMI-DADE',               projectId: 'N/A',      hwy: null,   amendments: 1,    status: 'Submitted',   autoWithdraw: false, withErrors: true,  description: 'Florida DOT-D6 POSTING DATES: 03/18/2025 and 04/01/2025 CONTRACT DAYS: 730 The improvements under this Contract consist of Miami-Dade Expressway Authority maintenance activities.' },
+      { date: 'Feb 25, 2026', agency: 'FDOT',   callNumber: 'Call 007', itemCode: 'T2A58',          location: 'DUVAL',                    projectId: 'D225067B', hwy: '7229', amendments: null, status: 'Draft',       autoWithdraw: false, withErrors: false, description: 'LETTING LOCATION: Contracts Administration Office POSTING DATES: 03/11/2026 and 03/25/2026 CONTRACT DAYS: 390 The improvements under this Contract consist of resurfacing SR 9A.' },
+      { date: 'Feb 21, 2025', agency: 'GADOT',  callNumber: 'Call 002', itemCode: 'B1CBA2501079-0', location: 'Clayton',                  projectId: 'M006428',  hwy: null,   amendments: 2,    status: 'Replacement', autoWithdraw: false, withErrors: false, description: '4.321 MILES OF MILLING, INLAY AND PLANT MIX RESURACING ON SR 85 BEGINNING AT ROBERTS DR AND EXTENDING TO SR 85.' },
+      { date: 'Jul 18, 2025', agency: 'GADOT',  callNumber: 'Call 001', itemCode: 'B1CBA2502466-0', location: 'Bibb',                     projectId: '311400-',  hwy: null,   amendments: 6,    status: 'Submitted',   autoWithdraw: true,  withErrors: true,  description: '3.016 MILES OF WIDENING AND RECONSTRUCTION ON I-75/SR 401 BEGINNING AT I-16/SR 404 AND EXTENDING TO PIERCE AVE; INCLUDES CONSTRUCTION OF 4 BRIDGES OVER NORFOLK SOUTHERN RAILROAD.' },
+      { date: 'Mar 5, 2026',  agency: 'NYSDOT', callNumber: 'Call 693', itemCode: 'D265693',        location: 'Putnam',                   projectId: 'TBD',      hwy: null,   amendments: 2,    status: 'Replacement', autoWithdraw: false, withErrors: false, description: 'BRIDGE REPLACEMENTS - Ramp G of I-84 over Interstates 84 & 684, Town of Southeast.' },
+      { date: 'Jan 16, 2025', agency: 'ODOT',   callNumber: 'Call 012', itemCode: 'GAL115533',      location: 'GALLIA',                   projectId: 'E240(998)', hwy: null,  amendments: 3,    status: 'Invalid',     autoWithdraw: false, withErrors: false, description: 'FOR IMPROVING VARIOUS SECTIONS IN GREEN TOWNSHIP, WITHIN GALLIA COUNTY, OHIO, CONSTRUCTING A DRILLED SHAFT AND CONCRETE LAGGING RETAINING WALL ALONG STATE ROUTE 7.' },
+      { date: 'Jul 8, 2025',  agency: 'WIDOT',  callNumber: 'Call 001', itemCode: '20250708001',    location: 'Rock',                     projectId: '5340-00-74', hwy: '081', amendments: null, status: 'Draft',       autoWithdraw: false, withErrors: false, description: 'Monroe - Beloit; CTH T Intersection — traffic signal installation and road reconstruction.' },
+    ])
+    const selectedCard       = _ref(null)
+    const rationaleExpanded  = _ref(false)
+    function openCard(card)  { selectedCard.value = card; rationaleExpanded.value = true }
+    function closeCard()     { selectedCard.value = null }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCard() })
+
+    const sortCriteria  = _ref('recent')
+    const sortAscending = _ref(false)
+    const filterStatus   = _ref('')
+    const statusCounts  = _computed(() => {
+      const c = { Draft: 0, Submitted: 0, Replacement: 0, Invalid: 0 }
+      followedItems.value.forEach(i => { if (i.status in c) c[i.status]++ })
+      return c
+    })
+    const sortedFollowedItems = _computed(() => {
+      let items = [...followedItems.value]
+      if (filterStatus.value) {
+        items = items.filter(i => i.status === filterStatus.value)
+      }
+      const dir = sortAscending.value ? 1 : -1
+      switch (sortCriteria.value) {
+        case 'agency':
+          return items.sort((a, b) => dir * a.agency.localeCompare(b.agency))
+        case 'letting-date':
+          return items.sort((a, b) => dir * (new Date(a.date) - new Date(b.date)))
+        default: // recent activity — preserve insertion order
+          return sortAscending.value ? items.reverse() : items
+      }
+    })
+    const activePeriod = _ref('7')
+    const endingSoonData = {
+      '7': [
+        { id: 1, date: 'Apr 21, 2026', agency: 'IADOT'  },
+        { id: 2, date: 'Apr 22, 2026', agency: 'GADOT'  },
+      ],
+      '30': [
+        { id: 1, date: 'Apr 21, 2026', agency: 'IADOT'  },
+        { id: 2, date: 'Apr 22, 2026', agency: 'GADOT'  },
+        { id: 3, date: 'Apr 29, 2026', agency: 'FDOT'   },
+        { id: 4, date: 'May 5, 2026',  agency: 'NYSDOT' },
+        { id: 5, date: 'May 15, 2026', agency: 'GADOT'  },
+      ],
+      '90': [
+        { id: 1, date: 'Apr 21, 2026', agency: 'IADOT'  },
+        { id: 2, date: 'Apr 22, 2026', agency: 'GADOT'  },
+        { id: 3, date: 'Apr 29, 2026', agency: 'FDOT'   },
+        { id: 4, date: 'May 5, 2026',  agency: 'NYSDOT' },
+        { id: 5, date: 'May 15, 2026', agency: 'GADOT'  },
+        { id: 6, date: 'May 20, 2026', agency: 'FDOT'   },
+        { id: 7, date: 'Jun 3, 2026',  agency: 'WIDOT'  },
+        { id: 8, date: 'Jun 18, 2026', agency: 'ODOT'   },
+        { id: 9, date: 'Jul 9, 2026',  agency: 'NYSDOT' },
+      ],
+    }
+    const endingSoonItems = _computed(() => endingSoonData[activePeriod.value] || [])
+
+    function scrollCarousel(dir) {
+      if (!carouselEl.value) return
+      carouselEl.value.scrollBy({ left: dir * 284, behavior: 'smooth' })
+    }
+
+    return { activeTab, carouselEl, recommendedCards, followedItems, sortedFollowedItems, activePeriod, endingSoonItems, scrollCarousel, sortCriteria, sortAscending, filterStatus, statusCounts, selectedCard, rationaleExpanded, openCard, closeCard }
+  }
+})
+_app.config.compilerOptions.isCustomElement = tag => tag.startsWith('cw-')
+_app.mount('#app')
+</script>
+
+<!--
+CAUSEWAY COMPONENTS USED
+─────────────────────────
+cw-bidx-app-layout, cw-bidx-agency-picker-favorites, cw-bidx-agency-picker-item
+cw-app-menu-item
+cw-tabs, cw-tab
+cw-badge
+cw-card
+cw-button
+cw-calendar
+cw-dropdown-menu, cw-dropdown-menu-group, cw-dropdown-menu-item
+cw-empty-state
+cw-icon-view-dashboard, cw-icon-federal, cw-icon-calendar, cw-icon-magnify,
+cw-icon-line-chart, cw-icon-analytics-alt, cw-icon-group, cw-icon-admin,
+cw-icon-sparkles, cw-icon-chevron-left, cw-icon-chevron-right,
+cw-icon-bookmark, cw-icon-bookmark-outline, cw-icon-clear, cw-icon-more-vert,
+cw-icon-flag-outline, cw-icon-open-in-new
+
+Causeway version: 1.92.0
+Bundle: https://bcdn.infotechinc.com/causeway/v1.92.0/all.umd.js
+-->
+</body>
+</html>

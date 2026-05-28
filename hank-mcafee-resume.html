@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hank McAfee — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Aleo:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #1a2535;
+      --blue:      #2d7dd2;
+      --ink:       #1a2535;
+      --ink-mid:   #3d4f62;
+      --ink-muted: #7a8fa3;
+      --rule:      #dde3ea;
+      --page-w:    680px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.5;
+      color: var(--ink);
+      background: #f0f2f4;
+      padding: 2rem;
+    }
+
+    .page {
+      width: var(--page-w);
+      min-height: 980px;
+      background: #fff;
+      margin: 0 auto;
+      padding: 2.25rem 3rem 2rem;
+      position: relative;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 2rem;
+      padding-bottom: 1.1rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .header-name {
+      font-family: 'Aleo', Georgia, serif;
+      font-size: 26pt;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .header-title {
+      font-size: 8.5pt;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-top: 0.3rem;
+    }
+
+    .header-contact {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .header-contact a,
+    .header-contact span {
+      font-size: 8.5pt;
+      color: var(--ink-muted);
+      text-decoration: none;
+      display: block;
+      letter-spacing: 0.01em;
+    }
+
+    .header-contact a:hover { color: var(--blue); }
+
+    /* ── Layout columns ── */
+    .body {
+      display: grid;
+      grid-template-columns: 1fr 188px;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    /* ── Section labels ── */
+    .section {
+      margin-bottom: 1.9rem;
+    }
+
+    .section-title {
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.55rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── Experience entries ── */
+    .entry {
+      margin-bottom: 1.5rem;
+    }
+
+    .entry:last-child { margin-bottom: 0; }
+
+    .entry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .entry-title {
+      font-family: 'Aleo', Georgia, serif;
+      font-size: 10.5pt;
+      font-weight: 600;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .entry-dates {
+      font-size: 7.5pt;
+      font-weight: 500;
+      color: var(--blue);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .entry-company {
+      font-size: 8pt;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .entry-desc {
+      font-size: 8.5pt;
+      color: var(--ink-mid);
+      line-height: 1.6;
+    }
+
+    .entry-list {
+      list-style: none;
+      margin-top: 0.35rem;
+    }
+
+    .entry-list li {
+      font-size: 8.5pt;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      padding-left: 0.9rem;
+      position: relative;
+      margin-bottom: 0.15rem;
+    }
+
+    .entry-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-weight: 700;
+      font-size: 12pt;
+      line-height: 1.2;
+    }
+
+    /* ── Sidebar sections ── */
+    .sidebar .section-title {
+      border-bottom-color: var(--rule);
+    }
+
+    .skill-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .skill-group-label {
+      font-size: 7pt;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .skill-tag {
+      font-size: 7.5pt;
+      font-weight: 500;
+      color: var(--ink-mid);
+      background: #f0f4f8;
+      border-radius: 3px;
+      padding: 2px 6px;
+      line-height: 1.4;
+    }
+
+    .sidebar-list {
+      list-style: none;
+    }
+
+    .sidebar-list li {
+      font-size: 8.5pt;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      padding-left: 0.75rem;
+      position: relative;
+      margin-bottom: 0.1rem;
+    }
+
+    .sidebar-list li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .sidebar-note {
+      font-size: 8pt;
+      color: var(--ink-muted);
+      line-height: 1.55;
+    }
+
+    .accent-rule {
+      border: none;
+      border-top: 2px dotted var(--blue);
+      margin-bottom: 2rem;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; min-height: auto; width: 100%; padding: 0.5in 0.6in; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <div class="header-name">Hank McAfee</div>
+      <div class="header-title">Product Designer · Gainesville, FL</div>
+    </div>
+    <div class="header-contact">
+      <a href="mailto:hmcafee@me.com">hmcafee@me.com</a>
+      <a href="https://hankmcafee.com">hankmcafee.com</a>
+      <a href="tel:3522816904">352-281-6904</a>
+    </div>
+  </header>
+
+  <hr class="accent-rule" />
+
+  <!-- Two-column body -->
+  <div class="body">
+
+    <!-- Main column -->
+    <main>
+
+      <!-- Experience -->
+      <div class="section">
+        <div class="section-title">Experience</div>
+
+        <div class="entry">
+          <div class="entry-header">
+            <div class="entry-title">Lead Product Designer</div>
+            <div class="entry-dates">2020 – Present</div>
+          </div>
+          <div class="entry-company">Infotech · Gainesville, FL</div>
+          <ul class="entry-list">
+            <li>Reimagined internal Design System UI and UX working hand-in-hand with frontend engineers</li>
+            <li>Redesigned critical user workflows including onboarding, identity verification, upgrade/downgrade, settings, and role-based dashboards</li>
+            <li>Led UX for new product applications leveraging updated design patterns and Causeway components</li>
+            <li>Partnered with front-end engineering team to bridge design and implementation across the full product suite</li>
+            <li>Drove organizational alignment on design standards, component usage, and cross-product consistency</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-header">
+            <div class="entry-title">Associate Publisher &amp; Creative Director</div>
+            <div class="entry-dates">1999 – 2020</div>
+          </div>
+          <div class="entry-company">Tower Publications, Inc. · Gainesville, FL</div>
+          <ul class="entry-list">
+            <li>Voice of design across the company's full suite of print and digital publications</li>
+            <li>Defined and executed brand strategy, editorial design, advertising design, and product identity</li>
+            <li>Mentored design staff; managed vendor relationships, production schedules, and asset systems</li>
+          </ul>
+        </div>
+
+        <div class="entry">
+          <div class="entry-header">
+            <div class="entry-title">Graphic Designer</div>
+            <div class="entry-dates">1998 – 1999</div>
+          </div>
+          <div class="entry-company">Scripps-Howard Newspapers (The Stuart News)</div>
+        </div>
+
+      </div><!-- /Experience -->
+
+      <!-- Affiliations -->
+      <div class="section">
+        <div class="section-title">Professional Affiliations</div>
+        <div class="entry">
+          <div class="entry-header">
+            <div class="entry-title">Conference Committee &amp; 2019 Chairman</div>
+            <div class="entry-dates">2015 – 2020</div>
+          </div>
+          <div class="entry-company">Association of Free Community Publications (AFCP)</div>
+          <div class="entry-desc">Conference Chairman (Las Vegas, 2019), Trade Show Chairman (Baltimore, 2018), Awards Show Chairman (Louisville, 2017).</div>
+        </div>
+      </div>
+
+    </main><!-- /main -->
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="section">
+        <div class="section-title">Design Skills</div>
+        <div class="skill-group">
+          <div class="skill-tags">
+            <span class="skill-tag">Design systems</span>
+            <span class="skill-tag">UI / UX</span>
+            <span class="skill-tag">Interaction design</span>
+            <span class="skill-tag">Brand identity</span>
+            <span class="skill-tag">Editorial design</span>
+            <span class="skill-tag">Print production</span>
+            <span class="skill-tag">Design leadership</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Tools &amp; Technology</div>
+        <div class="skill-group">
+          <div class="skill-tags">
+            <span class="skill-tag">Figma</span>
+            <span class="skill-tag">Tailwind CSS</span>
+            <span class="skill-tag">Web Components</span>
+            <span class="skill-tag">HTML / CSS / JS</span>
+            <span class="skill-tag">Adobe Creative Suite</span>
+            <span class="skill-tag">AI prototyping</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Education</div>
+        <div class="entry-title" style="font-size:9pt;">Florida School of the Arts</div>
+        <div class="entry-company" style="margin-top:0.2rem;">Graphic Design · 1996–1997</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Awards</div>
+        <div class="sidebar-note">ADDY, AFCP, SAPA, IFPA, CPF</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Community</div>
+        <div class="entry-title" style="font-size:9pt;">Marketing &amp; Fundraising Committee</div>
+        <div class="entry-company" style="margin-top:0.2rem; margin-bottom:0.35rem;">Humane Society of North Central FL · 2016–Present</div>
+        <div class="sidebar-note">Brand identity, collateral design, and event sponsorship support.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Portfolio</div>
+        <div class="sidebar-note"><a href="https://hankmcafee.com" style="color: var(--blue); text-decoration: none; font-weight: 500;">hankmcafee.com</a></div>
+      </div>
+
+    </aside>
+
+  </div><!-- /body -->
+
+</div><!-- /page -->
+</body>
+</html>

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscription Retention — Hank McAfee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Aleo:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ───────────────────────────────────────── */
+    :root {
+      --navy:       #1a2535;
+      --navy-light: #243044;
+      --navy-muted: rgba(255,255,255,0.06);
+      --blue:       #2456A5;
+      --blue-light: #4595D7;
+      --orange:      #FA872E;
+      --orange-dark: #DC6A13;
+      --slate:      #f4f6f8;
+      --slate-mid:  #e2e8f0;
+      --white:      #ffffff;
+      --ink:        #1a2535;
+      --ink-mid:    #3d4f62;
+      --ink-muted:  #7a8fa3;
+      --ink-faint:  #b0bfcc;
+      --font-display: 'Aleo', Georgia, serif;
+      --font-body:    'Inter', system-ui, sans-serif;
+      --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--ink);
+      background: var(--slate);
+    }
+
+    /* ── Sticky header ───────────────────────────────────────── */
+    .cs-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--navy);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 56px;
+    }
+    .cs-header-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .cs-header-back:hover { color: var(--orange); }
+    .cs-header-logo a { display: block; line-height: 0; }
+    .cs-header-logo img { height: 28px; display: block; }
+
+    /* ── Reveal animation ─────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Hero ─────────────────────────────────────────────── */
+    .cs-hero {
+      background: var(--navy);
+      padding: 5rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cs-hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(45,125,210,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cs-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 15%;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(250,135,46,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cs-hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .cs-hero-eyebrow {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 1.25rem;
+    }
+    .cs-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 3.75rem);
+      line-height: 1.08;
+      color: var(--white);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+    .cs-hero h1 em {
+      font-style: italic;
+      color: var(--orange);
+    }
+    .cs-hero-desc {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.72;
+      max-width: 580px;
+      margin-bottom: 2.5rem;
+    }
+    .cs-hero-meta {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 1.75rem;
+    }
+    .cs-meta-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0.3rem;
+    }
+    .cs-meta-value {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.82);
+    }
+
+    /* ── Stats band ───────────────────────────────────────── */
+    .cs-stats-band {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-mid);
+      padding: 2.5rem 2rem;
+    }
+    .cs-stats-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .ds-stat {
+      background: var(--slate);
+      border: 1px solid var(--slate-mid);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+    .ds-stat-num {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--navy);
+      line-height: 1;
+    }
+    .ds-stat-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 0.4rem;
+    }
+
+    /* ── Content column ───────────────────────────────────── */
+    .cs-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    /* ── Section labels & rule ────────────────────────────── */
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 1.25rem;
+    }
+    .rule {
+      height: 2px;
+      background: linear-gradient(90deg, var(--orange) 0%, var(--blue) 40%, transparent 100%);
+      border: none;
+      margin: 2rem 0;
+      border-radius: 2px;
+    }
+
+    /* ── Prose ─────────────────────────────────────────────── */
+    .cs-h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.15;
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+    }
+    .cs-h2 em { font-style: italic; color: var(--blue); }
+    .cs-p {
+      font-size: 0.97rem;
+      color: var(--ink-mid);
+      line-height: 1.82;
+      margin-bottom: 1.1rem;
+    }
+    .cs-p:last-child { margin-bottom: 0; }
+
+    /* ── Tier grid ─────────────────────────────────────────── */
+    .tier-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0 0.75rem;
+    }
+    .tier-card {
+      background: var(--white);
+      border: 1px solid var(--slate-mid);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .tier-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px var(--blue);
+    }
+    .tier-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 0.25rem;
+    }
+    .tier-price {
+      font-size: 1.55rem;
+      font-weight: 300;
+      color: var(--ink-mid);
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+    .tier-price span { font-size: 0.78rem; color: var(--ink-muted); }
+    .tier-features {
+      list-style: none;
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.85;
+    }
+    .tier-features li::before { content: '· '; color: var(--orange); }
+
+    /* ── Problem callout ─────────────────────────────────── */
+    .problem-callout {
+      background: #fef5ec;
+      border-left: 3px solid var(--orange);
+      border-radius: 0 6px 6px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.75rem 0;
+      font-size: 0.92rem;
+      color: var(--ink-mid);
+      line-height: 1.75;
+    }
+    .problem-callout strong { color: var(--ink); }
+
+    /* ── Decision cards ─────────────────────────────────────── */
+    .decisions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+    .decision-card {
+      background: var(--white);
+      border: 1px solid var(--slate-mid);
+      border-radius: 10px;
+      padding: 1.75rem 2rem;
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+    .decision-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--orange);
+      font-family: var(--font-display);
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      letter-spacing: 0.02em;
+    }
+    .decision-heading {
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      color: var(--navy);
+      font-weight: 400;
+      margin-bottom: 0.55rem;
+      line-height: 1.3;
+    }
+    .decision-text {
+      font-size: 0.88rem;
+      color: var(--ink-mid);
+      line-height: 1.8;
+    }
+
+    /* ── Prototype card ─────────────────────────────────────── */
+    .proto-card {
+      background: var(--navy-light);
+      border-radius: 10px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .proto-card-text strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--white);
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .proto-card-text p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.52);
+      line-height: 1.65;
+    }
+
+    /* ── Flow diagram placeholder ──────────────────────────── */
+    .flow-diagram-wrap {
+      display: block;
+      margin-top: 1.5rem;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--slate-mid);
+      text-decoration: none;
+      position: relative;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    .flow-diagram-wrap:hover {
+      border-color: var(--blue-light);
+      box-shadow: 0 6px 24px rgba(26,37,53,0.1);
+    }
+    .flow-diagram-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .flow-diagram-caption {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--white);
+      border-top: 1px solid var(--slate-mid);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.03em;
+    }
+    .flow-diagram-caption span {
+      color: var(--ink-muted);
+      font-weight: 400;
+      margin-left: auto;
+      font-size: 0.72rem;
+    }
+
+    /* ── Outcome callout ───────────────────────────────────── */
+    .outcome-callout {
+      background: var(--navy);
+      border-radius: 10px;
+      padding: 2.5rem;
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .outcome-stat-num {
+      font-family: var(--font-display);
+      font-size: 3.25rem;
+      color: var(--orange);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .outcome-stat-label {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.65;
+    }
+
+    /* ── Buttons ───────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      transition: all 0.2s var(--ease);
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-primary { background: var(--blue); color: var(--white); }
+    .btn-primary:hover { background: var(--blue-light); transform: translateY(-1px); }
+
+    /* ── Footer ──────────────────────────────────────────── */
+    .cs-footer {
+      background: var(--navy);
+      padding: 2.25rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .cs-footer a {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.48);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .cs-footer a:hover { color: var(--orange); }
+    .cs-footer-copy {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.22);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 680px) {
+      .cs-stats-inner { grid-template-columns: 1fr 1fr; }
+      .tier-grid { grid-template-columns: 1fr; }
+      .outcome-callout { grid-template-columns: 1fr; }
+.decision-card { padding: 1.5rem; }
+      .cs-hero-meta { gap: 1.5rem; }
+      .cs-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    }
+    @media (max-width: 420px) {
+      .cs-stats-inner { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="cs-header">
+    <a href="index.html#work" class="cs-header-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+        <path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Portfolio
+    </a>
+    <div class="cs-header-logo">
+      <a href="index.html" aria-label="Hank McAfee — Portfolio">
+        <img src="hm-identity.svg" alt="Hank McAfee" height="28" />
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Hero ──────────────────────────────────────────────── -->
+  <section class="cs-hero">
+    <div class="cs-hero-inner">
+      <div class="cs-hero-eyebrow reveal">Case Study · Subscription UX</div>
+      <h1 class="reveal reveal-delay-1">Subscription<br><em>Flow Redesign</em></h1>
+      <p class="cs-hero-desc reveal reveal-delay-2">Redesigning cancel, downgrade, and upsell flows for a SaaS platform ahead of a significant price increase — using friction as a design tool rather than an obstacle.</p>
+      <div class="cs-hero-meta reveal reveal-delay-3">
+        <div class="cs-meta-item">
+          <div class="cs-meta-label">Role</div>
+          <div class="cs-meta-value">Lead Product Designer</div>
+        </div>
+        <div class="cs-meta-item">
+          <div class="cs-meta-label">Scope</div>
+          <div class="cs-meta-value">UX Design · Prototype · Flow Documentation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Context ────────────────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Context</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">About <em>the product</em></h2>
+      <p class="cs-p reveal reveal-delay-2">SaaS platform used by contractors across the country to view and submit bids for advertised bid opportunities from state transportation agencies.</p>
+      <p class="cs-p reveal reveal-delay-2">The subscription model is built around three tiers, with optional add-ons available to paid accounts:</p>
+
+      <div class="tier-grid reveal reveal-delay-3">
+        <div class="tier-card">
+          <div class="tier-name">Free</div>
+          <div class="tier-price">$0<span>/mo</span></div>
+          <ul class="tier-features">
+            <li>Basic letting search</li>
+            <li>Limited bid history</li>
+            <li>No electronic submission</li>
+          </ul>
+        </div>
+        <div class="tier-card featured">
+          <div class="tier-name">Tier 1</div>
+          <div class="tier-price">$100<span>/mo</span></div>
+          <ul class="tier-features">
+            <li>Electronic bid submission</li>
+            <li>Bid history &amp; reporting</li>
+          </ul>
+        </div>
+        <div class="tier-card">
+          <div class="tier-name">Tier 2</div>
+          <div class="tier-price">$349<span>/mo</span></div>
+          <ul class="tier-features">
+            <li>Everything in Tier 1</li>
+            <li>Advanced analytics</li>
+            <li>AI features</li>
+          </ul>
+        </div>
+      </div>
+      <p class="cs-p reveal" style="font-size: 0.83rem; color: var(--ink-muted); margin-top: 0.75rem;">Add-ons available on paid tiers</p>
+    </div>
+  </div>
+
+  <!-- ── Problem ────────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">The Problem</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">A universal cancel flow<br><em>before a price increase</em></h2>
+      <p class="cs-p reveal reveal-delay-2">The existing cancel flow treated every user identically with a single path regardless of tier, active add-ons, or account history. There was no reliable retention mechanism.</p>
+
+      <div class="problem-callout reveal reveal-delay-3">
+        <strong>A Q1 price increase was coming.</strong> Projections estimated 5–10% cancellation across paid accounts.
+      </div>
+
+      <p class="cs-p reveal reveal-delay-2">The business needed a cancel flow that could do several things at once: respect users who genuinely wanted to leave, surface real value to those who might not have considered a downgrade, and handle the complexity of tier-aware paths and pending states without feeling manipulative or confusing.</p>
+    </div>
+  </div>
+
+  <!-- ── Design Decisions ───────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Design Decisions</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Five decisions that<br><em>shaped the flow</em></h2>
+      <p class="cs-p reveal reveal-delay-2">These weren't the only design choices in the project, but they were the ones where the reasoning mattered most.</p>
+
+      <div class="decisions-list">
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">01</div>
+          <div class="decision-body">
+            <div class="decision-heading">Easy outs</div>
+            <p class="decision-text">Modal actions were carefully considered to use placement and weight to lead toward retention. All actions are clearly labeled and always available, but visual hierarchy is doing some heavy lifting. A user must make a slightly more deliberate choice to proceed with the destructive action.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">02</div>
+          <div class="decision-body">
+            <div class="decision-heading">Show the cost early</div>
+            <p class="decision-text">Before any confirmation step, the flow surfaces a clear list of will be lost based on their current tier and active add-ons. Make the decision feel real and considered.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">03</div>
+          <div class="decision-body">
+            <div class="decision-heading">Tier-aware paths</div>
+            <p class="decision-text">Tier 2 subscribers get a choice to downgrade to Tier 1 or cancel entirely. Free and Tier 1 users go straight to the cancel path. A Tier 2 user may not realize that Tier 1 still covers what they really need. Branching happens early, so the user always knows where they're headed.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">04</div>
+          <div class="decision-body">
+            <div class="decision-heading">A little incentive</div>
+            <p class="decision-text">Discount offer appears only after the user has cleared the feature loss summary. It's framed simply, and never repeated. Gating it was deliberate: offering it too early feels like a bribe; offering it after a confirmation feels desperate. The timing matters.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">05</div>
+          <div class="decision-body">
+            <div class="decision-heading">Clear confirmation</div>
+            <p class="decision-text">Require typing CANCEL or DOWNGRADE to confirm. It's not security theater — something real is happening. The action is permanent (access continues through the end of the billing period) and final. Permanent cancellation is a separate flow available to active, unpaid accounts, and treated with similar friction and an exit survey before permanently shutting the door.</p>
+          </div>
+        </div>
+
+        <div class="decision-card reveal reveal-delay-2">
+          <div class="decision-num">06</div>
+          <div class="decision-body">
+            <div class="decision-heading">CMD-Z</div>
+            <p class="decision-text">Both downgrade-pending and cancel-pending accounts see a persistent reactivation option in their settings. A single click to reverse the scheduled change before the billing period closes. Continued access to what they've already paid for and the door is temporarily open to maintain that access easily.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Prototype ───────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Prototype</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Try the <em>live prototype</em></h2>
+      <p class="cs-p reveal reveal-delay-2">The prototype covers the full cancel and downgrade flows for both Tier 1 and Tier 2 accounts — including the feature loss summary, loyalty discount offer, typed confirmation, and pending-state views with single-click reactivation. Built with Vue 3, the Causeway component library, and Tailwind CSS.</p>
+      <div class="proto-card reveal reveal-delay-3">
+        <div class="proto-card-text">
+          <p style="font-size:0.97rem;line-height:1.7;">Open preset to a specific tier. Try cancelling as a Tier 2 user to see the tier-aware fork — or as a Tier 1 user to go straight to the feature loss summary. Reactivation is available from the pending state.</p>
+        </div>
+        <div style="display:flex;flex-direction:row;flex-wrap:wrap;gap:0.6rem;flex-shrink:0;">
+          <a href="portfolio/settings-billing-free.html" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--navy-light);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);">
+            Free Flow →
+          </a>
+          <a href="portfolio/settings-billing-tier1.html" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--blue);color:var(--white);">
+            Tier 1 Flow →
+          </a>
+          <a href="portfolio/settings-billing-tier2.html" target="_blank" rel="noopener" class="btn btn-primary" style="background:var(--orange);color:var(--navy);">
+            Tier 2 Flow →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Flow diagram ────────────────────────────────────────── -->
+  <div style="background: var(--white); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Flow Diagram</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Cancel &amp; downgrade <em>flow map</em></h2>
+      <p class="cs-p reveal reveal-delay-2">The full user flow was documented in FigJam, mapping all entry points, tier branches, discount gate, confirmation steps, and pending states.</p>
+      <a href="https://www.figma.com/board/nB06iXYYRFOUg8bwJZ4lQs/Subscription-Lifecycle--Upgrade---Downgrade---Cancel?t=eOyFtFB06J83Sh56-6" target="_blank" rel="noopener" class="flow-diagram-wrap reveal reveal-delay-3">
+        <img src="img-figjam-flow.png" alt="Subscription Lifecycle flow diagram — Upgrade, Downgrade, Cancel" />
+        <div class="flow-diagram-caption">
+          Open in FigJam →
+          <span>Subscription Lifecycle — Upgrade, Downgrade, Cancel</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Outcome ─────────────────────────────────────────────── -->
+  <div style="background: var(--slate); border-bottom: 1px solid var(--slate-mid);">
+    <div class="cs-content">
+      <div class="section-label reveal">Outcome</div>
+      <hr class="rule reveal reveal-delay-1">
+      <h2 class="cs-h2 reveal reveal-delay-1">Under 1% of paid accounts<br><em>churned during the increase</em></h2>
+      <div class="outcome-callout reveal reveal-delay-2">
+        <div>
+          <div class="outcome-stat-num">&lt;1%</div>
+          <div class="outcome-stat-label">Of paid accounts churned or downgraded during the Q1 price increase — against a projection of 5–10%</div>
+        </div>
+        <div>
+          <div class="outcome-stat-num">&gt;50%</div>
+          <div class="outcome-stat-label">Of users who initiated cancellation abandoned the flow before completing it — most likely at the feature loss summary</div>
+        </div>
+      </div>
+
+      <p class="cs-p reveal" style="margin-top: 2rem;">The feature loss summary appears to be the highest-leverage element in the flow. Without step-level instrumentation it's not possible to confirm this directly, but the abandonment pattern is consistent with users seeing their tier's feature list and reconsidering. The loyalty discount likely captured a smaller segment of high-intent cancellers who had already processed the loss framing.</p>
+      <p class="cs-p reveal">The reactivation path was used by a meaningful subset of users who completed a cancel or downgrade — a strong signal that the friction introduced was considered rather than frustrating, and that keeping the door open had real value beyond the billing period.</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ──────────────────────────────────────────────── -->
+  <footer class="cs-footer">
+    <a href="index.html">← Back to Portfolio</a>
+    <span class="cs-footer-copy">Hank McAfee · Product Design</span>
+    <a href="mailto:hmcafee@me.com">hmcafee@me.com</a>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => revealObs.observe(el));
+  </script>
+
+</body>
+</html>
