@@ -370,6 +370,8 @@
     .vert-rotator   { display:block; }
     .pct-wrap,.num-wrap,.pill-wrap,.label-500-wrap { display:contents; }
     .counter-rotate { /* no-op at desktop */ }
+    .pill-stack { display:flex;flex-direction:column;align-items:center;gap:6px; }
+    /* mobile: reverse to row so reset lands left of pill on screen */
 
     /* ── Causeway Explorer Drawer ───────────────────────────── */
     #cwx-drawer { position:fixed;inset:0;z-index:500;pointer-events:none; }
@@ -445,7 +447,7 @@
 
       /* ── Color method diagram — vertical rotation ─────────── */
       .vert-container { container-type:inline-size;height:600px;display:flex;align-items:center;justify-content:center;overflow:hidden; }
-      .vert-rotator   { flex:none;height:calc(100cqw - 80px);transform:rotate(90deg); }
+      .vert-rotator   { flex:none;height:calc(100cqw - 64px);transform:rotate(90deg);margin-left:16px; }
       .diagram-wrap   { width:600px;height:100%;margin-top:0; }
       .diagram-arc    { top:auto;bottom:-13px;height:110px; }
       .tint-col,.shade-col { height:100%;padding-bottom:32px;overflow:hidden; }
@@ -455,7 +457,9 @@
       .chip-box       { flex:1 0 0;min-height:0;height:auto; }
       .pct-wrap       { display:flex;height:29px;width:20px;align-items:center;justify-content:center;flex-shrink:0; }
       .num-wrap       { display:flex;height:33px;width:24px;align-items:center;justify-content:center;flex-shrink:0; }
-      .pill-wrap      { display:flex;height:120px;width:32px;align-items:center;justify-content:center;flex-shrink:0; }
+      .pill-wrap      { display:flex;height:180px;width:52px;align-items:center;justify-content:center;flex-shrink:0; }
+      .pill-stack     { flex-direction:row-reverse;align-items:center; }
+      #cwm-reset      { margin-top:0 !important; }
       .label-500-wrap { display:flex;height:33px;width:24px;align-items:center;justify-content:center;flex-shrink:0; }
       .counter-rotate { flex:none;transform:rotate(-90deg); }
     }
@@ -590,14 +594,14 @@
               <!-- Center: base Color 500 -->
               <div class="main-col">
                 <div class="pill-wrap">
-                  <div class="counter-rotate">
+                  <div class="counter-rotate pill-stack">
                     <label for="cwm-color-picker" class="color-pill" style="cursor:pointer;" title="Pick a color">
                       <span>Change color</span>
                     </label>
+                    <button id="cwm-reset" style="display:none;background:none;border:none;cursor:pointer;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-muted);margin-top:6px;padding:0;text-decoration:underline;text-underline-offset:2px;">Reset</button>
                   </div>
                 </div>
                 <input type="color" id="cwm-color-picker" value="#004BD9" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
-                <button id="cwm-reset" style="display:none;background:none;border:none;cursor:pointer;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-muted);margin-top:6px;padding:0;text-decoration:underline;text-underline-offset:2px;">Reset</button>
                 <div class="indicator-line"></div>
                 <div class="label-500-wrap">
                   <div class="counter-rotate"><span class="color-500-label">500</span></div>
