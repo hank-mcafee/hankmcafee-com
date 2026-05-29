@@ -365,6 +365,12 @@
     .indicator-line { flex:1 0 0;min-height:4px;width:1px;background-color:#566372;mix-blend-mode:luminosity; }
     .main-col .color-500-label { font-size:16px;font-weight:700;line-height:24px;color:#FFFFFF;text-align:center;white-space:nowrap;flex-shrink:0; }
 
+    /* ── Vertical rotation wrapper — desktop pass-throughs ───── */
+    .vert-container { width:100%; }
+    .vert-rotator   { display:block; }
+    .pct-wrap,.num-wrap,.pill-wrap,.label-500-wrap { display:contents; }
+    .counter-rotate { /* no-op at desktop */ }
+
     /* ── Causeway Explorer Drawer ───────────────────────────── */
     #cwx-drawer { position:fixed;inset:0;z-index:500;pointer-events:none; }
     #cwx-drawer.open { pointer-events:auto; }
@@ -436,6 +442,22 @@
       .ds-explorer-cta { flex-direction: column; align-items: flex-start; }
       .cs-footer { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
       .tok-palette-label { width: 56px; font-size: .62rem; }
+
+      /* ── Color method diagram — vertical rotation ─────────── */
+      .vert-container { container-type:inline-size;height:600px;display:flex;align-items:center;justify-content:center;overflow:hidden; }
+      .vert-rotator   { flex:none;height:calc(100cqw - 80px);transform:rotate(90deg); }
+      .diagram-wrap   { width:600px;height:100%;margin-top:0; }
+      .diagram-arc    { top:auto;bottom:-13px;height:110px; }
+      .tint-col,.shade-col { height:100%;padding-bottom:32px;overflow:hidden; }
+      .main-col       { height:100%;padding-bottom:40px; }
+      .chips-row      { flex:1 0 0;min-height:0; }
+      .chip           { height:100%; gap:16px; }
+      .chip-box       { flex:1 0 0;min-height:0;height:auto; }
+      .pct-wrap       { display:flex;height:29px;width:20px;align-items:center;justify-content:center;flex-shrink:0; }
+      .num-wrap       { display:flex;height:33px;width:24px;align-items:center;justify-content:center;flex-shrink:0; }
+      .pill-wrap      { display:flex;height:120px;width:32px;align-items:center;justify-content:center;flex-shrink:0; }
+      .label-500-wrap { display:flex;height:33px;width:24px;align-items:center;justify-content:center;flex-shrink:0; }
+      .counter-rotate { flex:none;transform:rotate(-90deg); }
     }
     @media (max-width: 420px) {
       .cs-stats-inner { grid-template-columns: 1fr; }
@@ -481,28 +503,6 @@
     </div>
   </section>
 
-  <!-- ── Stats band ─────────────────────────────────────────── -->
-  <div class="cs-stats-band">
-    <div class="cs-stats-inner">
-      <div class="ds-stat reveal">
-        <div class="ds-stat-num">90+</div>
-        <div class="ds-stat-label">Web components</div>
-      </div>
-      <div class="ds-stat reveal reveal-delay-1">
-        <div class="ds-stat-num">5</div>
-        <div class="ds-stat-label">Products served</div>
-      </div>
-      <div class="ds-stat reveal reveal-delay-2">
-        <div class="ds-stat-num">~5yr</div>
-        <div class="ds-stat-label">In development</div>
-      </div>
-      <div class="ds-stat reveal reveal-delay-3">
-        <div class="ds-stat-num">1</div>
-        <div class="ds-stat-label">Token preset</div>
-      </div>
-    </div>
-  </div>
-
   <!-- ── Main content ───────────────────────────────────────── -->
   <div style="background:var(--slate);">
     <div class="cs-content">
@@ -526,14 +526,6 @@
                 <div class="ds-stat-num">5</div>
                 <div class="ds-stat-label">Products served</div>
               </div>
-              <div class="ds-stat">
-                <div class="ds-stat-num">~5yr</div>
-                <div class="ds-stat-label">In development</div>
-              </div>
-              <div class="ds-stat">
-                <div class="ds-stat-num">1</div>
-                <div class="ds-stat-label">Token preset</div>
-              </div>
             </div>
             <div class="ds-explorer-cta">
               <div>
@@ -553,58 +545,95 @@
           <p class="tok-desc">Causeway tints and shades are created by applying white (screened) or black (multiplied) to a base 500 color at stepped opacity intervals. This method creates monochromatic harmony. And, by applying the same amount of tint or shade to the other colors, creates nuance harmony for the entire palette.</p>
         </div>
 
-        <div class="diagram-wrap">
+        <div class="vert-container">
+          <div class="vert-rotator">
+            <div class="diagram-wrap">
 
-          <!-- Arc — Azul 500 fill -->
-          <div class="diagram-arc">
-            <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="107" viewBox="0 0 1008 107" preserveAspectRatio="none" fill="none">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M503.455 0C323.883 0 153.399 12.829 0 35.9572V107C153.399 84.0524 323.883 71.0428 503.455 71.0428C683.572 71.0428 854.419 84.0524 1008 107V35.9572C854.419 13.0097 683.572 0 503.455 0Z" fill="#004BD9"/>
-            </svg>
-          </div>
+              <!-- Arc — Azul 500 fill -->
+              <div class="diagram-arc">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="107" viewBox="0 0 1008 107" preserveAspectRatio="none" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M503.455 0C323.883 0 153.399 12.829 0 35.9572V107C153.399 84.0524 323.883 71.0428 503.455 71.0428C683.572 71.0428 854.419 84.0524 1008 107V35.9572C854.419 13.0097 683.572 0 503.455 0Z" fill="#004BD9"/>
+                </svg>
+              </div>
 
-          <!-- Tints (white overlays: 050 → 400) -->
-          <div class="tint-col">
-            <div class="arrow-row">
-              <div class="arrow-seg"></div>
-              <span class="arrow-label">TINTS</span>
-              <div class="arrow-seg"></div>
-            </div>
-            <div class="chips-row">
-              <div class="chip"><span class="chip-pct">90%</span><div class="chip-box" style="background-color:rgba(255,255,255,0.9);"><span class="chip-num-dark">050</span></div></div>
-              <div class="chip"><span class="chip-pct">80%</span><div class="chip-box" style="background-color:rgba(255,255,255,0.8);"><span class="chip-num-dark">100</span></div></div>
-              <div class="chip"><span class="chip-pct">60%</span><div class="chip-box" style="background-color:rgba(255,255,255,0.6);"><span class="chip-num-dark">200</span></div></div>
-              <div class="chip"><span class="chip-pct">40%</span><div class="chip-box" style="background-color:rgba(255,255,255,0.4);"><span class="chip-num-dark">300</span></div></div>
-              <div class="chip"><span class="chip-pct">20%</span><div class="chip-box" style="background-color:rgba(255,255,255,0.2);"><span class="chip-num-dark">400</span></div></div>
-            </div>
-          </div>
+              <!-- Tints (white overlays: 050 → 400) -->
+              <div class="tint-col">
+                <div class="arrow-row">
+                  <div class="arrow-seg"></div>
+                  <span class="arrow-label">TINTS</span>
+                  <div class="arrow-seg"></div>
+                </div>
+                <div class="chips-row">
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">90%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(255,255,255,0.9);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-dark">050</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">80%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(255,255,255,0.8);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-dark">100</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">60%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(255,255,255,0.6);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-dark">200</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">40%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(255,255,255,0.4);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-dark">300</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">20%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(255,255,255,0.2);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-dark">400</span></div></div></div>
+                  </div>
+                </div>
+              </div>
 
-          <!-- Center: base Color 500 -->
-          <div class="main-col">
-            <label for="cwm-color-picker" class="color-pill" style="cursor:pointer;" title="Pick a color">
-              <span>Change color</span>
-            </label>
-            <input type="color" id="cwm-color-picker" value="#004BD9" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
-            <button id="cwm-reset" style="display:none;background:none;border:none;cursor:pointer;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-muted);margin-top:6px;padding:0;text-decoration:underline;text-underline-offset:2px;">Reset</button>
-            <div class="indicator-line"></div>
-            <span class="color-500-label">500</span>
-          </div>
+              <!-- Center: base Color 500 -->
+              <div class="main-col">
+                <div class="pill-wrap">
+                  <div class="counter-rotate">
+                    <label for="cwm-color-picker" class="color-pill" style="cursor:pointer;" title="Pick a color">
+                      <span>Change color</span>
+                    </label>
+                  </div>
+                </div>
+                <input type="color" id="cwm-color-picker" value="#004BD9" style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;">
+                <button id="cwm-reset" style="display:none;background:none;border:none;cursor:pointer;font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-muted);margin-top:6px;padding:0;text-decoration:underline;text-underline-offset:2px;">Reset</button>
+                <div class="indicator-line"></div>
+                <div class="label-500-wrap">
+                  <div class="counter-rotate"><span class="color-500-label">500</span></div>
+                </div>
+              </div>
 
-          <!-- Shades (black overlays: 600 → 900) -->
-          <div class="shade-col">
-            <div class="arrow-row">
-              <div class="arrow-seg"></div>
-              <span class="arrow-label">SHADES</span>
-              <div class="arrow-seg"></div>
-            </div>
-            <div class="chips-row">
-              <div class="chip"><span class="chip-pct">20%</span><div class="chip-box" style="background-color:rgba(0,0,0,0.2);"><span class="chip-num-light">600</span></div></div>
-              <div class="chip"><span class="chip-pct">40%</span><div class="chip-box" style="background-color:rgba(0,0,0,0.4);"><span class="chip-num-light">700</span></div></div>
-              <div class="chip"><span class="chip-pct">60%</span><div class="chip-box" style="background-color:rgba(0,0,0,0.6);"><span class="chip-num-light">800</span></div></div>
-              <div class="chip"><span class="chip-pct">80%</span><div class="chip-box" style="background-color:rgba(0,0,0,0.8);"><span class="chip-num-light">900</span></div></div>
-            </div>
-          </div>
+              <!-- Shades (black overlays: 600 → 900) -->
+              <div class="shade-col">
+                <div class="arrow-row">
+                  <div class="arrow-seg"></div>
+                  <span class="arrow-label">SHADES</span>
+                  <div class="arrow-seg"></div>
+                </div>
+                <div class="chips-row">
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">20%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(0,0,0,0.2);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-light">600</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">40%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(0,0,0,0.4);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-light">700</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">60%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(0,0,0,0.6);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-light">800</span></div></div></div>
+                  </div>
+                  <div class="chip">
+                    <div class="pct-wrap"><div class="counter-rotate"><span class="chip-pct">80%</span></div></div>
+                    <div class="chip-box" style="background-color:rgba(0,0,0,0.8);"><div class="num-wrap"><div class="counter-rotate"><span class="chip-num-light">900</span></div></div></div>
+                  </div>
+                </div>
+              </div>
 
-        </div><!-- /diagram-wrap -->
+            </div><!-- /diagram-wrap -->
+          </div><!-- /vert-rotator -->
+        </div><!-- /vert-container -->
 
       </div>
 
