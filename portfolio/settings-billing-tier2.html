@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BidX — Settings</title>
+  <title>Settings</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://assets.infotechinc.com/causeway-sdk/v1.93.0-alpha.2/tailwind-preset.umd.js"></script>
   <script>tailwind.config = { presets: [CausewayTailwindPreset] }</script>
@@ -41,58 +41,48 @@
 </head>
 <body>
   <div id="app" v-cloak>
-    <cw-bidx-app-layout
-      v-show="!showStripeCheckout"
-      :user-name="fullName"
-      :user-email="emailValue"
-      :business-name="companyValue"
-      agency-name="Florida Department of Transportation">
+    <cw-app-layout v-show="!showStripeCheckout">
 
-      <!-- Sidebar: user-level nav -->
-      <cw-app-menu-item slot="menu" content="Workspace" href="#">
-        <cw-icon-view-dashboard></cw-icon-view-dashboard>
-      </cw-app-menu-item>
+      <cw-app-header
+        slot="header"
+        theme="infotech"
+        @menu-toggle-click="sidebarOpen = !sidebarOpen">
+        <div slot="right" class="flex items-center gap-2">
+        </div>
+      </cw-app-header>
 
-      <!-- Sidebar: agency-level nav -->
-      <cw-app-menu-item slot="menu-agency" content="Home" href="#">
-        <cw-icon-federal></cw-icon-federal>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Lettings" href="#">
-        <cw-icon-calendar></cw-icon-calendar>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Search" href="#">
-        <cw-icon-magnify></cw-icon-magnify>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Advantage" href="#">
-        <cw-icon-line-chart></cw-icon-line-chart>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Bid Tab Analysis" href="#">
-        <cw-icon-analytics-alt></cw-icon-analytics-alt>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Business Network" href="#">
-        <cw-icon-group></cw-icon-group>
-      </cw-app-menu-item>
-      <cw-app-menu-item slot="menu-agency" content="Agency Admin" href="#">
-        <cw-icon-admin></cw-icon-admin>
-      </cw-app-menu-item>
-
-      <!-- Help dropdown content -->
-      <cw-dropdown-menu-group slot="help">
-        <cw-dropdown-menu-item type="link" content="Knowledge base" href="#" target="_blank">
-          <cw-icon-open-in-new slot="icon-right"></cw-icon-open-in-new>
-        </cw-dropdown-menu-item>
-      </cw-dropdown-menu-group>
-      <cw-dropdown-menu-item slot="help" content="Send feedback…"></cw-dropdown-menu-item>
-
-      <!-- User menu actions -->
-      <cw-button slot="user-menu-actions" size="sm" theme="secondary" appearance="outlined" content="Settings" href="#"></cw-button>
-      <cw-button slot="user-menu-actions" size="sm" theme="secondary" content="Sign out"></cw-button>
-
-      <!-- Footer links -->
-      <a slot="footer-links" href="https://www.infotechinc.com/legal-notices" target="_blank">Legal</a>
-      <a slot="footer-links" href="https://releases.infotechinc.com/#all+Bidx.com+all" target="_blank">Releases</a>
-      <a slot="footer-links" href="https://www.infotechinc.com/contact" target="_blank">Contact</a>
-      <a slot="footer-links" href="#" target="_blank">Support</a>
+      <cw-app-sidebar slot="sidebar" style="height: 100%;">
+        <cw-app-menu class="pt-2">
+          <cw-app-menu-group>
+            <cw-app-menu-item content="Workspace" href="#">
+              <cw-icon-view-dashboard></cw-icon-view-dashboard>
+            </cw-app-menu-item>
+          </cw-app-menu-group>
+          <cw-app-menu-group>
+            <cw-app-menu-item content="Home" href="#">
+              <cw-icon-federal></cw-icon-federal>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Lettings" href="#">
+              <cw-icon-calendar></cw-icon-calendar>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Search" href="#">
+              <cw-icon-magnify></cw-icon-magnify>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Advantage" href="#">
+              <cw-icon-line-chart></cw-icon-line-chart>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Bid Tab Analysis" href="#">
+              <cw-icon-analytics-alt></cw-icon-analytics-alt>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Business Network" href="#">
+              <cw-icon-group></cw-icon-group>
+            </cw-app-menu-item>
+            <cw-app-menu-item content="Agency Admin" href="#">
+              <cw-icon-admin></cw-icon-admin>
+            </cw-app-menu-item>
+          </cw-app-menu-group>
+        </cw-app-menu>
+      </cw-app-sidebar>
 
       <!-- ═══════════════════════════════════════════════
            Main page content
@@ -127,7 +117,7 @@
             <span slot="content">Your loyalty discount has been activated and will apply to upcoming invoices until {{ loyaltyEndDate }}</span>
           </cw-callout>
           <cw-callout v-else-if="subscriptionStatus === 'starter' || currentPlan === 'free'" type="notice" size="md">
-            <span slot="content">You're using a Free plan. Upgrade to unlock the power of Bidx. <a href="#" class="font-semibold text-azul-500" @click.prevent="openUpgradeOverlay">Upgrade subscription</a></span>
+            <span slot="content">You're using a Free plan. Upgrade to unlock the power of Product. <a href="#" class="font-semibold text-azul-500" @click.prevent="openUpgradeOverlay">Upgrade subscription</a></span>
           </cw-callout>
 
           <!-- Tabs area: horizontally centered, max 600px wide -->
@@ -171,7 +161,7 @@
                       <div class="flex flex-wrap content-baseline items-baseline gap-x-2">
                         <span class="min-w-[64px] max-w-[80px] flex-1 text-xs text-secondary">Name</span>
                         <div id="name-edit-trigger" class="group relative flex-1 min-w-0 cursor-pointer pr-6" @click="openNameModal">
-                          <span class="text-sm font-medium text-primary whitespace-nowrap group-hover:text-azul-500">{{ fullName }}</span>
+                          <span class="text-sm font-medium text-primary group-hover:text-azul-500">{{ fullName }}</span>
                           <button class="edit-btn text-midnight-200 group-hover:text-azul-500" aria-label="Edit name">
                             <cw-icon-edit class="w-4 h-4"></cw-icon-edit>
                           </button>
@@ -182,7 +172,7 @@
                       <div class="flex flex-wrap content-baseline items-baseline gap-x-2">
                         <span class="min-w-[64px] max-w-[80px] flex-1 text-xs text-secondary">Email</span>
                         <div id="email-edit-trigger" class="group relative flex-1 min-w-0 cursor-pointer pr-6" @click="openEmailModal">
-                          <span class="text-sm font-medium text-primary whitespace-nowrap group-hover:text-azul-500">{{ emailValue }}</span>
+                          <span class="text-sm font-medium text-primary group-hover:text-azul-500">{{ emailValue }}</span>
                           <button class="edit-btn text-midnight-200 group-hover:text-azul-500" aria-label="Edit email">
                             <cw-icon-edit class="w-4 h-4"></cw-icon-edit>
                           </button>
@@ -193,7 +183,7 @@
                       <div class="flex flex-wrap content-baseline items-baseline gap-x-2">
                         <span class="min-w-[64px] max-w-[80px] flex-1 text-xs text-secondary">Password</span>
                         <div id="password-edit-trigger" class="group relative flex-1 min-w-0 cursor-pointer pr-6" @click="resetPasswordModal">
-                          <span class="text-sm font-medium text-primary whitespace-nowrap group-hover:text-azul-500">•••••••••</span>
+                          <span class="text-sm font-medium text-primary group-hover:text-azul-500">•••••••••</span>
                           <button class="edit-btn text-midnight-200 group-hover:text-azul-500" aria-label="Edit password">
                             <cw-icon-edit class="w-4 h-4"></cw-icon-edit>
                           </button>
@@ -214,7 +204,7 @@
                       <div class="flex flex-wrap content-baseline items-baseline gap-x-2">
                         <span class="min-w-[64px] max-w-[80px] flex-1 text-xs text-secondary">Company</span>
                         <div id="company-edit-trigger" class="group relative flex-1 min-w-0 cursor-pointer pr-6" @click="openCompanyModal">
-                          <span class="text-sm font-medium text-primary whitespace-nowrap group-hover:text-azul-500">{{ companyValue }}</span>
+                          <span class="text-sm font-medium text-primary group-hover:text-azul-500">{{ companyValue }}</span>
                           <button class="edit-btn text-midnight-200 group-hover:text-azul-500" aria-label="Edit company">
                             <cw-icon-edit class="w-4 h-4"></cw-icon-edit>
                           </button>
@@ -225,7 +215,7 @@
                       <div class="flex flex-wrap content-baseline items-baseline gap-x-2">
                         <span class="min-w-[64px] max-w-[80px] flex-1 text-xs text-secondary">Phone</span>
                         <div id="phone-edit-trigger" class="group relative flex-1 min-w-0 cursor-pointer pr-6" @click="openPhoneModal">
-                          <span class="text-sm font-medium text-primary whitespace-nowrap group-hover:text-azul-500">{{ phoneValue }}</span>
+                          <span class="text-sm font-medium text-primary group-hover:text-azul-500">{{ phoneValue }}</span>
                           <button class="edit-btn text-midnight-200 group-hover:text-azul-500" aria-label="Edit phone">
                             <cw-icon-edit class="w-4 h-4"></cw-icon-edit>
                           </button>
@@ -320,8 +310,8 @@
                   <div class="flex flex-col gap-4 p-4">
                     <h3 class="text-sm font-semibold text-primary leading-none">Important links</h3>
                     <div class="flex flex-col gap-2">
-                      <a href="#" class="text-sm text-azul-500">AASHTOware Project Bids™ Bid Component</a>
-                      <a href="#" class="text-sm text-azul-500">Bidx.com release notes</a>
+                      <a href="#" class="text-sm text-azul-500">External Application</a>
+                      <a href="#" class="text-sm text-azul-500">Product release notes</a>
                     </div>
                   </div>
                 </cw-card>
@@ -659,7 +649,7 @@
                         <cw-icon-lock-open slot="icon-right"></cw-icon-lock-open>
                       </cw-button>
                       <p class="text-xs text-secondary text-left w-full">
-                        *Requires Infotech® Digital ID and signatory authorization.
+                        *Requires Digital ID and signatory authorization.
                         <a href="#" class="font-medium text-azul-500">Learn more</a>
                       </p>
                     </div>
@@ -667,7 +657,7 @@
                     <!-- Empty state: no Digital IDs yet (paid plans) -->
                     <div v-else-if="digitalIds.length === 0"
                          class="flex flex-col gap-4 items-center rounded-lg p-10 text-center bg-azul-50">
-                      <p class="text-2xl font-semibold text-primary">Bid submission requires an Infotech® Digital ID</p>
+                      <p class="text-2xl font-semibold text-primary">Bid submission requires an Digital ID</p>
                       <cw-button id="did-get-trigger" content="Get Digital ID" theme="primary" appearance="filled" size="lg">
                         <cw-icon-check-verified slot="icon-left"></cw-icon-check-verified>
                       </cw-button>
@@ -766,7 +756,7 @@
                         <!-- Agency authorization panel — empty state -->
                         <div v-if="['installed','not-found','expired'].includes(did.state) && !(did.authorizations && did.authorizations.length)"
                              class="flex flex-col gap-4 items-start overflow-hidden rounded p-4 bg-azul-50 border border-azul-100">
-                          <p class="text-sm text-center w-full text-primary leading-5">Agency authorization is required to submit bids online through Bid Express.</p>
+                          <p class="text-sm text-center w-full text-primary leading-5">Agency authorization is required to submit bids online through Product.</p>
                           <div class="flex justify-center w-full">
                             <cw-button content="Request authorization" theme="primary" appearance="filled" size="md" @click="openAuthRequestModal(did.id)">
                               <cw-icon-add slot="icon-left"></cw-icon-add>
@@ -790,7 +780,7 @@
                             </button>
                             <cw-popover :for="'auth-count-' + did.id" size="md" no-close>
                               <div class="flex flex-col gap-2">
-                                <p class="text-sm font-medium text-primary leading-5">Paid Bidx.com subscriptions include one or more bidding authorization for Agency/business combination(s).</p>
+                                <p class="text-sm font-medium text-primary leading-5">Paid Product subscriptions include one or more bidding authorization for Agency/business combination(s).</p>
                                 <div class="flex flex-col gap-2 px-4 py-2 text-sm font-medium text-primary leading-5">
                                   <div class="flex items-center gap-2">
                                     <p class="flex-1 min-w-0">Core plan includes</p>
@@ -886,7 +876,7 @@
                         </div>
                         <div class="flex flex-col gap-2 items-center text-center w-full">
                           <p class="text-2xl font-bold text-cinnabar-700">Digital ID will expire in {{ did.daysUntilExpiry }} days</p>
-                          <p class="text-sm text-primary">There is no charge to renew your Infotech® Digital ID before it expires.</p>
+                          <p class="text-sm text-primary">There is no charge to renew your Digital ID before it expires.</p>
                         </div>
                         <div class="flex flex-col gap-2 items-start text-sm w-full text-primary">
                           <p>Expiration will result in:</p>
@@ -916,10 +906,10 @@
                 <!-- Disclaimer -->
                 <div class="flex flex-col gap-4">
                   <p class="text-xs text-primary">
-                    For agencies that do not use Bidx integrated bid forms, you must have the AASHTOWare Project Bids™ Bid component installed* with a complete user profile. In addition, an Infotech® Digital ID is required for each person who will sign and submit a bid.
+                    For agencies that do not use Product integrated bid forms, you must have the External Application installed* with a complete user profile. In addition, an Digital ID is required for each person who will sign and submit a bid.
                     <a href="#" class="font-medium text-azul-500">Learn more</a>
                   </p>
-                  <cw-button content="Get Project Bids" theme="secondary" appearance="filled" size="sm" fill>
+                  <cw-button content="Get External Application" theme="secondary" appearance="filled" size="sm" fill>
                     <cw-icon-open-in-new slot="icon-right"></cw-icon-open-in-new>
                   </cw-button>
                   <p class="text-xs text-secondary">*Requires Windows 10</p>
@@ -934,7 +924,7 @@
 
       </div><!-- /main content -->
 
-    </cw-bidx-app-layout>
+    </cw-app-layout>
 
     <!-- Manage dropdowns — outside app layout per Causeway floating element pattern -->
     <template v-for="did in digitalIds" :key="'manage-menu-' + did.id">
@@ -1259,7 +1249,7 @@
       <div class="flex flex-col gap-6">
         <div class="flex flex-col gap-4">
           <p class="text-sm text-primary">Are you sure? This action can't be undone.</p>
-          <p class="text-sm text-primary">Any/all bidding authorizations associated with this Infotech® Digital ID will also be removed.</p>
+          <p class="text-sm text-primary">Any/all bidding authorizations associated with this Digital ID will also be removed.</p>
           <p class="text-base font-bold text-center w-full text-primary">{{ removeTargetDid?.name }}</p>
         </div>
         <cw-field-group size="md" help="Field is not case sensitive">
@@ -1357,7 +1347,7 @@
     <!-- ── Generate Digital ID modal ────────────────────────────── -->
     <span id="did-generate-trigger" class="hidden"></span>
     <span id="did-generate-close" class="hidden"></span>
-    <cw-modal for="did-generate-trigger did-generate-close" heading="Infotech® Digital ID" size="sm" footer-layout="fill">
+    <cw-modal for="did-generate-trigger did-generate-close" heading="Digital ID" size="sm" footer-layout="fill">
       <div class="flex flex-col gap-4">
         <p class="text-sm -mt-2 text-secondary">Assign password</p>
         <div class="flex flex-col gap-4 rounded-lg p-3 bg-azul-700">
@@ -1395,7 +1385,7 @@
     <span id="did-install-close" class="hidden"></span>
     <cw-modal
       for="did-install-trigger did-install-cancel did-install-close"
-      heading="Infotech® Digital ID"
+      heading="Digital ID"
       subheading="Authorize browser installation"
       size="sm">
       <cw-field-group size="md">
@@ -1534,7 +1524,7 @@
           </cw-field-group>
         </div>
         <cw-checkbox required size="sm" layout="vertical"
-          content="By submitting this registration form, I understand that I am providing this information to a third party to use to verify my identity. The information provided will not be stored or otherwise tracked except as required by law and by the application for audit and logging purposes. I further understand that these terms and conditions are subject to Infotech's Terms of Service and Privacy Policy.">
+          content="By submitting this registration form, I understand that I am providing this information to a third party to use to verify my identity. The information provided will not be stored or otherwise tracked except as required by law and by the application for audit and logging purposes. I further understand that these terms and conditions are subject to Company's Terms of Service and Privacy Policy.">
         </cw-checkbox>
       </div>
 
@@ -1548,7 +1538,7 @@
           <a href="#" class="text-sm font-medium text-azul-500 text-center w-full block">Send a new code</a>
         </div>
         <div v-if="verifyShowOverage" class="flex flex-col gap-3 rounded p-4 border border-specter-500">
-          <p class="text-xs text-secondary">The Digital ID included with your subscription has already been generated. Creation of an additional Digital ID will incur a one-time charge of $100 to the credit card on file with the Bid Express service.</p>
+          <p class="text-xs text-secondary">The Digital ID included with your subscription has already been generated. Creation of an additional Digital ID will incur a one-time charge of $100 to the credit card on file with the Product service.</p>
           <cw-checkbox required size="sm" layout="vertical"
             content="I understand, agree, and I authorize the fee for an additional Digital ID."
             :checked="verifyOverageAgreement" @change="verifyOverageAgreement = $event.target.checked">
@@ -1614,7 +1604,7 @@
     <span id="delete-step1-trigger" class="hidden"></span>
     <span id="delete-step1-close" class="hidden"></span>
     <cw-modal for="delete-step1-trigger delete-step1-close" heading="Delete account" size="md">
-      <p class="text-base font-medium text-cinnabar-500">Warning! You will lose all access to Bidx.com, including any billing history and invoice information.</p>
+      <p class="text-base font-medium text-cinnabar-500">Warning! You will lose all access to Product, including any billing history and invoice information.</p>
       <cw-button slot="actions" theme="primary" appearance="ghost" content="Continue" @click="advanceToSurvey"></cw-button>
       <cw-button slot="actions" theme="primary" content="Never mind" @click="closeDeleteModal"></cw-button>
     </cw-modal>
@@ -1650,16 +1640,16 @@
     <cw-modal for="delete-step3-trigger delete-step3-close" heading="Delete account" size="md">
       <div class="flex flex-col gap-4">
         <p class="text-base font-medium text-primary">Please read carefully. Action may be required prior to account deletion.</p>
-        <p class="text-sm font-medium text-cinnabar-500">Completing this form will permanently delete your Bidx.com account.</p>
+        <p class="text-sm font-medium text-cinnabar-500">Completing this form will permanently delete your Product account.</p>
         <cw-checkbox
-          content="Deleting my Bid Express® account at Bidx.com is permanent, and cannot be undone."
+          content="Deleting my Product account at Product is permanent, and cannot be undone."
           size="md" layout="vertical" required
           :checked="deleteCheckPermanent"
           :invalid="deleteCheckPermanentInvalid"
           @change="deleteCheckPermanent = $event.target.checked; deleteCheckPermanentInvalid = false">
         </cw-checkbox>
         <cw-checkbox
-          content="Account deletion will remove my account details and personal information. Infotech® may need to retain certain data, see Infotech's Privacy Policy for more information."
+          content="Account deletion will remove my account details and personal information. Company may need to retain certain data, see Company's Privacy Policy for more information."
           size="md" layout="vertical" required
           :checked="deleteCheckData"
           :invalid="deleteCheckDataInvalid"
@@ -2265,7 +2255,7 @@
 
         <!-- Caption -->
         <div class="flex flex-col gap-1 text-sm text-secondary text-center w-full">
-          <p class="font-semibold">All paid plans include an Infotech® Digital ID, world-class customer support, and online help documents.</p>
+          <p class="font-semibold">All paid plans include an Digital ID, world-class customer support, and online help documents.</p>
           <p class="font-normal">*Participating agencies. **Fee for each additional bidding authorization ($35/mo) or Digital ID ($100 one time).</p>
         </div>
       </div><!-- /plans view -->
@@ -2350,7 +2340,7 @@
         <!-- Online bidding info -->
         <div class="flex flex-col gap-2 bg-specter-200 rounded p-6 text-base text-secondary">
           <p class="font-semibold text-secondary">Get set up for online bidding</p>
-          <p>After you finish signing up, we'll walk you through getting your Infotech® Digital ID and submitting a request to bid with the agency of your choice.</p>
+          <p>After you finish signing up, we'll walk you through getting your Digital ID and submitting a request to bid with the agency of your choice.</p>
           <p v-if="upgradingToPlan === 'core'">If you need to submit bids to multiple agencies, you can add bidding authorizations with as many more agencies as you need for only $35/mo each.</p>
           <p v-else>If you need to submit bids to more than 5 agencies, you can add bidding authorizations with as many more agencies as you need for only $35/mo each.</p>
         </div>
@@ -2362,7 +2352,7 @@
           <div class="flex flex-col gap-2">
             <!-- Plan line -->
             <div class="flex items-start gap-2">
-              <p class="text-base text-primary">Bidx.com {{ upgradingToPlan === 'core' ? 'Core' : 'Advanced' }} plan ({{ upgradeInterval }})</p>
+              <p class="text-base text-primary">Product {{ upgradingToPlan === 'core' ? 'Core' : 'Advanced' }} plan ({{ upgradeInterval }})</p>
             </div>
             <!-- Plan Room line -->
             <div v-if="upgradingToPlan === 'advanced' || upgradeAddPlanRoom" class="flex items-start gap-2">
@@ -2421,7 +2411,7 @@
 
         <!-- Digital ID paragraph — only if no Digital ID -->
         <p v-if="!hasDigitalId" class="text-base font-medium text-primary">
-          Next, let's set up your Infotech® Digital ID so you can get the most from Bidx.
+          Next, let's set up your Digital ID so you can get the most from Product.
         </p>
 
       </div>
@@ -2443,11 +2433,10 @@
     <!-- ── Bespoke Stripe checkout screen ────────────────────────── -->
     <div v-show="showStripeCheckout" class="fixed inset-0 z-[200] flex" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
 
-      <!-- Left panel — Infotech blue, fills full viewport height -->
+      <!-- Left panel — Company blue, fills full viewport height -->
       <div class="flex-1 flex justify-end overflow-y-auto" style="background-color: #1558DC;">
       <div class="w-full max-w-[480px] flex flex-col gap-8 py-12 px-10">
         <!-- Logo -->
-        <img src="https://assets.infotechinc.com/causeway/logos/infotech-full-color-normalized.svg" alt="Infotech" class="h-9 w-auto object-contain object-left" style="filter: brightness(0) invert(1);">
         <!-- Subscription summary -->
         <div class="flex flex-col gap-1">
           <p class="text-sm" style="color: rgba(255,255,255,0.72)">{{ stripeSubscriptionTitle }}</p>
@@ -3241,13 +3230,13 @@
           upgradeInterval.value === 'monthly' ? 'per month' : 'per year'
         )
         const stripeItems = computed(() => {
-          const planLabel = upgradingToPlan.value === 'core' ? 'BidX - Core' : 'BidX - Advanced'
+          const planLabel = upgradingToPlan.value === 'core' ? 'Product - Core' : 'Product - Advanced'
           const intervalText = upgradeInterval.value === 'monthly' ? 'monthly' : 'annually'
           const mult = upgradeInterval.value === 'monthly' ? 1 : 12
           const items = [{ label: planLabel, price: upgradePlanMonthlyPrice.value, caption: `Qty 1, Billed ${intervalText}` }]
           if (upgradingToPlan.value === 'core') {
-            if (upgradeAddPlanRoom.value) items.push({ label: 'BidX - Online Plan Sheets Service', price: 95 * mult, caption: `Qty 1, Billed ${intervalText}` })
-            if (upgradeAddAnalysis.value) items.push({ label: 'BidX - Competitive Analysis Suite', price: 45 * mult, caption: `Qty 1, Billed ${intervalText}` })
+            if (upgradeAddPlanRoom.value) items.push({ label: 'Product - Online Plan Sheets Service', price: 95 * mult, caption: `Qty 1, Billed ${intervalText}` })
+            if (upgradeAddAnalysis.value) items.push({ label: 'Product - Competitive Analysis Suite', price: 45 * mult, caption: `Qty 1, Billed ${intervalText}` })
           }
           return items
         })
@@ -3282,7 +3271,7 @@
           ({ free: 'Free', core: 'Core', advanced: 'Advanced' })[currentPlan.value])
         const planDescription = computed(() => ({
           free:     'View lettings and proposals from 40+ agencies in the United States and Canada along with plan holder and eligible bidder information to prepare, save, and print bids.',
-          core:     'Everything you need for secure online bid submission — including an Infotech® Digital ID and online bidding authorization with for one business with any participating agency.',
+          core:     'Everything you need for secure online bid submission — including an Digital ID and online bidding authorization with for one business with any participating agency.',
           advanced: 'Complete access to our advanced Bid intelligence features. As well as cross-agency item search with a full year of history, and bid submission to multiple agencies.',
         })[currentPlan.value])
         const planHeroImage = computed(() => ({
@@ -3294,7 +3283,7 @@
           currentPlan.value === 'free' ? 'object-top' : 'object-center'
         )
         const planCancelWarning = computed(() => ({
-          free:     'Warning! You will lose all access to Bidx.com',
+          free:     'Warning! You will lose all access to Product',
           core:     'Caution! You will lose saved bids and settings',
           advanced: 'Caution! You will lose signatory authorization(s) and bid history',
         })[currentPlan.value])
@@ -3591,7 +3580,7 @@
           deleteCheckDataInvalid.value      = !deleteCheckData.value
           deletePasswordInvalid.value       = deletePassword.value.trim() === ''
           if (deleteCheckPermanentInvalid.value || deleteCheckDataInvalid.value || deletePasswordInvalid.value) return
-          window.location.href = 'https://www.infotechinc.com/bidx/'
+          window.location.href = '#'
         }
 
         const selectPlan = (plan) => {
@@ -3705,7 +3694,7 @@
 <!--
 CAUSEWAY COMPONENTS USED
 ─────────────────────────
-Layout:   cw-bidx-app-layout, cw-app-menu-item, cw-dropdown-menu-group, cw-dropdown-menu-item
+Layout:   cw-app-layout, cw-app-menu-item, cw-dropdown-menu-group, cw-dropdown-menu-item
 Nav:      cw-tabs, cw-tab
 Cards:    cw-card
 Feedback: cw-alert, cw-callout

@@ -22,7 +22,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bid Express — Bid Form</title>
+  <title>Bid Form</title>
   <style>[v-cloak] { display: none !important; }</style>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://assets.infotechinc.com/causeway-sdk/v1.93.0-alpha.2/tailwind-preset.umd.js"></script>
@@ -296,23 +296,14 @@
       <div class="shadow relative z-[1]">
       <cw-app-header
         theme="infotech"
-        brand-href="#"
 >
-
-        <a slot="brand" class="hidden sm:block" href="#">
-          <div class="h-8">
-            <img class="h-full" alt="Bid Express logo" src="https://assets.infotechinc.com/causeway/logos/bidx-normalized.svg">
-          </div>
-        </a>
 
         <div slot="left" class="flex h-full items-center gap-2">
           <!-- File menu -->
           <cw-button id="file-trigger" theme="secondary" appearance="ghost" content="File" size="md"></cw-button>
           <!-- Tools menu -->
           <cw-button id="tools-trigger" theme="secondary" appearance="ghost" content="Tools" size="md"></cw-button>
-          <!-- Help link -->
-          <cw-button theme="secondary" appearance="ghost" content="Help" size="md" href="https://bidx-help.zendesk.com/hc/en-us/categories/27982987898775-Contractor" target="_blank"></cw-button>
-          <!-- Check button -->
+<!-- Check button -->
           <cw-button class="hidden md:block" theme="secondary" appearance="ghost" content="Check" size="md" @click="runCheck">
             <cw-icon-check slot="icon-left"></cw-icon-check>
           </cw-button>
@@ -326,7 +317,7 @@
           <cw-tag content="Draft" theme="midnight" size="sm"></cw-tag>
           <span class="hidden sm:block text-base font-semibold text-secondary">{{ completionLabel }}</span>
           <cw-button v-if="bidSubmitted" theme="secondary" appearance="outlined" size="sm" content="Receipt"></cw-button>
-          <cw-button theme="secondary" appearance="ghost" size="md" label="Close bid form">
+          <cw-button theme="secondary" appearance="ghost" size="md" label="Close bid form" @click="window.close()">
             <cw-icon-clear slot="icon"></cw-icon-clear>
           </cw-button>
         </div>
@@ -504,7 +495,7 @@
         <template v-if="submitView === 'review'">
           <cw-field-group v-if="totalErrors > 0" layout="vertical">
             <cw-checkbox id="submit-acknowledge-checkbox" size="sm" layout="vertical"
-              content="I understand and acknowledge that a warning or error notice was issued by Bid Express®."
+              content="I understand and acknowledge that a warning or error notice was issued by Product."
               :checked.prop="submitAcknowledged"
               @change="onAcknowledgeChange($event.target.checked)">
             </cw-checkbox>
