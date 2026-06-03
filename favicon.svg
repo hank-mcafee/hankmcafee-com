@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#1a2535"/>
+  <!-- HM mark: scale to fit 24px tall, centered horizontally -->
+  <g transform="translate(7.7, 4) scale(0.175)">
+    <path d="M94.03 136.58V70.6H79.3V120.11H54.92V77.03H40.19V120.11H15.01V70.6H0.279999V136.58H94.03Z" fill="url(#fg_b)"/>
+    <path d="M79.3 66.62H94.03V0.640015H0.279999V66.62H15.01V17.11H40.19V60.19H54.92V17.11H79.3V66.62Z" fill="url(#fg_t)"/>
+  </g>
+  <defs>
+    <linearGradient id="fg_b" x1="0" y1="70" x2="94" y2="137" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#61C0ED"/>
+      <stop offset="1" stop-color="#0096D7"/>
+    </linearGradient>
+    <linearGradient id="fg_t" x1="0" y1="0" x2="94" y2="67" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#61C0ED"/>
+      <stop offset="1" stop-color="#0096D7"/>
+    </linearGradient>
+  </defs>
+</svg>
