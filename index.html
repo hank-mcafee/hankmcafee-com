@@ -1043,9 +1043,11 @@
         } catch {
           btn.disabled = false;
           btn.textContent = origText;
+          contactForm.querySelectorAll('.form-error').forEach(el => el.remove());
           const err = document.createElement('p');
+          err.className = 'form-error';
           err.style.cssText = 'color:#f87171;font-size:0.82rem;margin-top:0.5rem;';
-          err.textContent = 'All fields are required';
+          err.textContent = 'Something went wrong — please try again.';
           contactForm.appendChild(err);
         }
       });
